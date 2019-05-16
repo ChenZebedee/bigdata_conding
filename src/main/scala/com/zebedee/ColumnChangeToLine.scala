@@ -26,8 +26,7 @@ object ColumnChangeToLine {
       val outKey = value._1
       val outValue = value._2._1 ++ value._2._2
       (outKey, outValue)
-    }).reduceByKey((a, b) => a ++ b)
-    outData.map(outData => {
+    }).reduceByKey((a, b) => a ++ b).map(outData => {
       JSON.toJSONString(outData._2)
     }).saveAsTextFile(args(2))
   }
