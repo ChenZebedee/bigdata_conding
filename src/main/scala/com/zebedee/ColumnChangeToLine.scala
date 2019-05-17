@@ -27,7 +27,7 @@ object ColumnChangeToLine {
       val outValue = value._2._1 ++ value._2._2
       (outKey, outValue)
     }).reduceByKey((a, b) => a ++ b).map(outData => {
-      JSON.toJSONString(outData._2)
+      "2"+PunctuationConst.SPLITTER_STR+JSON.toJSONString(outData._2)
     }).saveAsTextFile(args(2))
   }
 
@@ -72,6 +72,12 @@ object ColumnChangeToLine {
 
     value
   }
+
+  def scendDataDeal(data:String): Map[String,String] ={
+    JSON.parseObject(data,Map[String,String].getClass)
+  }
+
+  def saveData2Hbase(){}
 
 
 }
