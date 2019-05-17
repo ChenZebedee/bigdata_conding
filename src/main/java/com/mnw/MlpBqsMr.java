@@ -8,7 +8,7 @@ import com.mnw.reduce.BqsReduce1;
 import com.mnw.reduce.BqsReduce2;
 import com.mnw.reduce.BqsReduce3;
 import com.mnw.reduce.MlpBqsReduce4;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -183,7 +183,7 @@ public class MlpBqsMr extends Configured implements Tool {
         FileOutputFormat.setOutputPath(job3, outPath3);
 
 
-        conf = HbaseUtils.systemConf(conf);
+        conf = HBaseUtils.systemConf(conf);
         Job job4 = Job.getInstance(conf, "outBqsData4");
         job4.addCacheFile(cacheFile);
         URI inPath6 = new URI("hdfs://data3:9000" + conf.get("inPath6"));

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.mnw.data.config.HBaseData;
 import com.mnw.data.constant.DataConstant;
 import com.mnw.data.constant.PunctuationConst;
-import com.mnw.data.constant.TableNameConst;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -17,7 +16,6 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.*;
 import java.net.URI;
@@ -27,7 +25,57 @@ import java.util.*;
 /**
  * Created by shaodi.chen on 2019/4/17.
  */
-public class HbaseUtils {
+public class HBaseUtils {
+
+    private static Connection    connection;
+    private static Configuration conf = new Configuration();
+
+    static {
+        conf.set("hbase.zookeeper.property.clientPort", "2181");
+        conf.set("hbase.zookeeper.quorum", "192.168.1.71,192.168.1.72,192.168.1.73");
+        conf.set("hbase.master", "192.168.1.72:60010");
+        conf.set("mapreduce.output.fileoutputformat.compress", "false");
+        conf.set("mapreduce.task.timeout", "1800000");
+
+        try {
+            connection = ConnectionFactory.createConnection(conf);
+            if (connection == null || connection.isClosed()) {
+                connection = ConnectionFactory.createConnection(conf);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Connection getConn() {
+        return connection;
+    }
+
+    public static boolean saveData2HBase(String tableName,Put put){
+        boolean isSuccess = false;
+        try(HTable hTable = (HTable) connection.getTable(TableName.valueOf(tableName))){
+            hTable.put(put);
+            isSuccess=true;
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return isSuccess;
+    }
+
+
+    public static boolean saveData2HBase(String tableName, List<Put> putList) {
+        boolean isSuccess = false;
+        try (HTable hTable = (HTable) connection.getTable(TableName.valueOf(tableName))) {
+            hTable.setAutoFlushTo(false);
+            hTable.setWriteBufferSize(100 * 1024 * 1024);
+            hTable.put(putList);
+            hTable.flushCommits();
+            isSuccess=true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return isSuccess;
+    }
 
     /**
      * Gets row key.
@@ -82,7 +130,7 @@ public class HbaseUtils {
      * @return the properties
      */
     public static Properties getPropertiesData(String fileName) {
-        InputStream inStream   = HbaseUtils.class.getClassLoader().getResourceAsStream(fileName);
+        InputStream inStream   = HBaseUtils.class.getClassLoader().getResourceAsStream(fileName);
         Properties  properties = new Properties();
         try {
             properties.load(inStream);
@@ -95,16 +143,16 @@ public class HbaseUtils {
     /**
      * Map 2 put put.
      *
-     * @param OrderSn            the order sn
+     * @param orderSn            the order sn
      * @param tableName          the table name
      * @param outDataMapWritable the out data map writable
      * @return the put
      */
-    public static Put map2Put(Text OrderSn, Text tableName, MapWritable outDataMapWritable) {
-        if (StringUtils.equals(OrderSn.toString(), DataConstant.NULL_STR)) {
-            return new Put(OrderSn.getBytes());
+    public static Put map2Put(Text orderSn, Text tableName, MapWritable outDataMapWritable) {
+        if (StringUtils.equals(orderSn.toString(), DataConstant.NULL_STR)) {
+            return new Put(orderSn.getBytes());
         }
-        Put put = new Put(OrderSn.toString().getBytes());
+        Put put = new Put(orderSn.toString().getBytes());
         for (Map.Entry otherDataEntry : outDataMapWritable.entrySet()) {
             put.addColumn(tableName.getBytes(), otherDataEntry.getKey().toString().getBytes(), otherDataEntry.getValue().toString().getBytes());
         }
@@ -292,39 +340,6 @@ public class HbaseUtils {
         }
     }
 
-    /**
-     * Add cache map.
-     *
-     * @param context the context
-     */
-    public static void addCacheMap(Mapper.Context context) {
-        Map<String, String> cacheData = new HashMap<>();
-        //预处理，把要关联的文件加载到缓存中
-        URI[]      URI  = new URI[0];
-        FileSystem hdfs = null;
-
-        try {
-            URI = context.getCacheFiles();
-            hdfs = FileSystem.get(context.getConfiguration());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //新的检索缓存文件的API是 context.getCacheFiles() ，而 context.getLocalCacheFiles() 被弃用
-        //然而 context.getCacheFiles() 返回的是 HDFS 路径； context.getLocalCacheFiles() 返回的才是本地路径
-
-        //这里只缓存了一个文件，所以取第一个即可
-        String line = null;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(hdfs.open(new Path(URI[0].getPath())), StandardCharsets.UTF_8))) {
-            while ((line = reader.readLine()) != null) {
-                String[] columnData = StringUtils.split(line, PunctuationConst.SPLITTER_USE, -1);
-                if (StringUtils.equals(columnData[0], TableNameConst.T_3RDAPI_SM_RELATION)) {
-                    cacheData.put(columnData[1], columnData[2]);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Map writable 2 string string.

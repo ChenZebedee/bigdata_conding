@@ -3,7 +3,7 @@ package com.mnw.mapper;
 import com.mnw.data.constant.ColumnHeadConstant;
 import com.mnw.data.constant.PunctuationConst;
 import com.mnw.data.constant.TableNameConst;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -64,7 +64,7 @@ public class MlpBqsMapper4 extends Mapper<LongWritable, Text, Text, MapWritable>
         String   line       = value.toString();
         String[] columnData = line.split(PunctuationConst.SPLITTER_USE, -1);
         if (columnData[0].equals(TableNameConst.BQS_END)) {
-            outValue = HbaseUtils.JsonString2MapWritable(columnData[1]);
+            outValue = HBaseUtils.JsonString2MapWritable(columnData[1]);
             String getKey = outValue.get(new Text(ColumnHeadConstant.BQS_QUERY_DATA + "f_query_data_id")).toString();
             outKey.set(keyMap.containsKey(getKey) ? keyMap.get(getKey) : "N");
             outValue.remove(new Text(ColumnHeadConstant.BQS_QUERY_DATA + "f_query_data_id"));

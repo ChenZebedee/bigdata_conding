@@ -2,7 +2,7 @@ package com.mnw.reduce;
 
 
 import com.mnw.data.constant.DataConstant;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.mapreduce.TableReducer;
@@ -27,7 +27,7 @@ public class MlpBqsReduce4 extends TableReducer<Text, MapWritable, NullWritable>
 
         String rowKey = key.toString();
         if (!StringUtils.equals(rowKey, DataConstant.NULL_STR)) {
-            Put put = HbaseUtils.map2Put(new Text(rowKey), new Text("bqsOut"), midWritable);
+            Put put = HBaseUtils.map2Put(new Text(rowKey), new Text("bqsOut"), midWritable);
             if (!put.isEmpty()) {
                 context.write(NullWritable.get(), put);
             }

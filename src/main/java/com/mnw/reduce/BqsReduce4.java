@@ -3,7 +3,7 @@ package com.mnw.reduce;
 
 import com.mnw.data.constant.ColumnHeadConstant;
 import com.mnw.data.constant.DataConstant;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.mapreduce.TableReducer;
@@ -26,9 +26,9 @@ public class BqsReduce4 extends TableReducer<Text, MapWritable, NullWritable> {
             midWritable.putAll(value);
         }
 
-        String rowKey = HbaseUtils.mapWritableRemoveData(midWritable, ColumnHeadConstant.T_3RDAPI_ORDER_SN_QUERY_DATA + "order_sn");
+        String rowKey = HBaseUtils.mapWritableRemoveData(midWritable, ColumnHeadConstant.T_3RDAPI_ORDER_SN_QUERY_DATA + "order_sn");
         if (!StringUtils.equals(rowKey, DataConstant.NULL_STR)) {
-            Put put = HbaseUtils.map2Put(new Text(rowKey), new Text("bqsOut"), midWritable);
+            Put put = HBaseUtils.map2Put(new Text(rowKey), new Text("bqsOut"), midWritable);
             if (!put.isEmpty()) {
                 context.write(NullWritable.get(), put);
             }
