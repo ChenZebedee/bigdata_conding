@@ -1,6 +1,6 @@
 package com.mnw.writable;
 
-import com.mnw.utils.HBaseUtils;
+import com.mnw.utils.HbaseUtils;
 import lombok.Data;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.io.MapWritable;
@@ -32,7 +32,7 @@ public class PaWritable implements WritableComparable<PaWritable> {
      * @return the put
      */
     public Put map2Put() {
-        return HBaseUtils.map2Put(orderSn, tableName, outDataMapWritable);
+        return HbaseUtils.map2Put(orderSn, tableName, outDataMapWritable);
     }
 
 
@@ -132,7 +132,7 @@ public class PaWritable implements WritableComparable<PaWritable> {
      * @return the put
      */
     public Put getPut() {
-        Put put = HBaseUtils.map2Put(orderSn, tableName, outDataMapWritable);
+        Put put = HbaseUtils.map2Put(orderSn, tableName, outDataMapWritable);
         return put;
     }
 }

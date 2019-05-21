@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Created by shaodi.chen on 2019/4/25.
  */
-public class PaReduce2 extends Reducer<Text, MapWritable, NullWritable, Text> {
+public class PaReduce22 extends Reducer<Text, MapWritable, NullWritable, Text> {
     @Override
     protected void reduce(Text key, Iterable<MapWritable> values, Context context) throws IOException, InterruptedException {
         MapWritable midWritable = new MapWritable();

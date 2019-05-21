@@ -1,6 +1,6 @@
 package com.mnw.writable;
 
-import com.mnw.utils.HBaseUtils;
+import com.mnw.utils.HbaseUtils;
 import lombok.Data;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -135,7 +135,7 @@ public class SmWritable implements WritableComparable<SmWritable> {
      * @return the put
      */
     public Put getPut() {
-        Put put = HBaseUtils.map2Put(orderSn, tableName, outDataMapWritable);
+        Put put = HbaseUtils.map2Put(orderSn, tableName, outDataMapWritable);
         put.addColumn(tableName.getBytes(), "f_score".getBytes(), f_score.getBytes());
         put.addColumn(tableName.getBytes(), "f_risk_level".getBytes(), f_risk_level.getBytes());
         return put;

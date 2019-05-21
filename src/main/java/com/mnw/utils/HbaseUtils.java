@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Created by shaodi.chen on 2019/4/17.
  */
-public class HBaseUtils {
+public class HbaseUtils {
 
     private static Connection    connection;
     private static Configuration conf = new Configuration();
@@ -130,7 +130,7 @@ public class HBaseUtils {
      * @return the properties
      */
     public static Properties getPropertiesData(String fileName) {
-        InputStream inStream   = HBaseUtils.class.getClassLoader().getResourceAsStream(fileName);
+        InputStream inStream   = HbaseUtils.class.getClassLoader().getResourceAsStream(fileName);
         Properties  properties = new Properties();
         try {
             properties.load(inStream);

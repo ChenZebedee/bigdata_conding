@@ -1,6 +1,6 @@
 package com.mnw.data.config;
 
-import com.mnw.utils.HBaseUtils;
+import com.mnw.utils.HbaseUtils;
 import lombok.Data;
 
 import java.util.LinkedHashMap;
@@ -47,7 +47,7 @@ public class HBaseData {
     public HBaseData(String rowKey, String columnsName, List<String> dataList, List<Integer> indexs, Map<String, String> columnMapping) {
         this(rowKey, columnsName);
         for (String data : dataList) {
-            this.dataMap.putAll(HBaseUtils.row2Column(data, indexs, columnMapping));
+            this.dataMap.putAll(HbaseUtils.row2Column(data, indexs, columnMapping));
         }
     }
 

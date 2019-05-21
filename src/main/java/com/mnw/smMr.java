@@ -2,7 +2,7 @@ package com.mnw;
 
 import com.mnw.mapper.SmMapper1;
 import com.mnw.reduce.SmReduce1;
-import com.mnw.utils.HBaseUtils;
+import com.mnw.utils.HbaseUtils;
 import com.mnw.writable.SmWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -61,7 +61,7 @@ public class smMr extends Configured implements Tool {
 //        conf.set("fs.default.name", "hdfs://data3:9000");
 //        conf.set("mapreduce.app-submission.cross-platform", "true");//跨平台提交
 
-        conf = HBaseUtils.systemConf(conf);
+        conf = HbaseUtils.systemConf(conf);
 
 
         conf.set("inPath1", strings[0]);

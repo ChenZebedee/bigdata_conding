@@ -11,12 +11,15 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by shaodi.chen on 2019/4/25.
  */
-public class PaMapper3 extends Mapper<LongWritable, Text, Text, MapWritable> {
+public class PaMapper22 extends Mapper<LongWritable, Text, Text, MapWritable> {
 
+    private Map<String, Map<String, Integer>> tableColumnIndex = new HashMap<>();
     private Text                              outKey           = new Text();
     private MapWritable                       outValue         = new MapWritable();
 
@@ -25,21 +28,13 @@ public class PaMapper3 extends Mapper<LongWritable, Text, Text, MapWritable> {
         String   line       = value.toString();
         String[] columnData = line.split(PunctuationConst.SPLITTER_USE, -1);
         switch (columnData[0]) {
-            case TableNameConst.PA_SECOND:
             case TableNameConst.PA_FIRST:
                 outValue = HbaseUtils.JsonString2MapWritable(columnData[1]);
-//                outKey.set(HbaseUtils.mapWritableRemoveData(outValue, ColumnHeadConstant.T_3RDAPI_PA_OVERDUE_RECORD + "f_query_data_id"));
-                outKey.set(HbaseUtils.mapWritableRemoveData(outValue, "f_query_data_id"));
+                outKey.set(HbaseUtils.mapWritableRemoveData(outValue, ColumnHeadConstant.T_3RDAPI_PA_LOAN_RECORD + "f_query_data_id"));
                 break;
-            case TableNameConst.T_3RDAPI_ORDER_SN_QUERY_DATA:
-                outKey.set(columnData[3]);
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_ORDER_SN_QUERY_DATA + "order_sn"), new Text(columnData[1]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_ORDER_SN_QUERY_DATA + "borrower_id"), new Text(columnData[2]));
-                break;
-            case TableNameConst.T_3RDAPI_PA_PHONE_TAG:
-                outKey.set(columnData[2]);
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_PHONE_TAG + "f_tag"), new Text(columnData[8]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_PHONE_TAG + "f_times"), new Text(columnData[9]));
+            case TableNameConst.T_3RDAPI_PA_LOAN_QUERY_DATA:
+                outKey.set(columnData[1]);
+                outValue.put(new Text( "f_query_data_id"), new Text(columnData[2]));
                 break;
             default:
                 outKey.set("N");

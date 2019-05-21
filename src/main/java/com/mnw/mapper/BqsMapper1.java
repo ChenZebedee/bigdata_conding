@@ -3,7 +3,7 @@ package com.mnw.mapper;
 import com.mnw.data.constant.ColumnHeadConstant;
 import com.mnw.data.constant.PunctuationConst;
 import com.mnw.data.constant.TableNameConst;
-import com.mnw.utils.HBaseUtils;
+import com.mnw.utils.HbaseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.MapWritable;
@@ -27,7 +27,7 @@ public class BqsMapper1 extends Mapper<LongWritable, Text, Text, MapWritable> {
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
         URI[] URI = context.getCacheFiles();
-        cacheData = HBaseUtils.getBqsCacheMap(URI, context.getConfiguration());
+        cacheData = HbaseUtils.getBqsCacheMap(URI, context.getConfiguration());
         super.setup(context);
     }
 

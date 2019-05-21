@@ -6,7 +6,7 @@ import java.util.Properties
 import com.alibaba.fastjson.JSON
 import com.mnw.data.config.HBaseData
 import com.mnw.data.constant.PunctuationConst
-import com.mnw.utils.{FileUtils, HBaseUtils}
+import com.mnw.utils.{FileUtils, HbaseUtils}
 import org.apache.commons.lang3.StringUtils
 import org.apache.hadoop.hbase.client.Put
 import org.apache.spark.rdd.RDD
@@ -84,8 +84,8 @@ object ColumnChangeToLine {
   }
 
   def saveData2Hbase(tableName:String): Unit ={
-    val outPut:Put = HBaseUtils.data2Put(new HBaseData())
-    val isSuccess = HBaseUtils.saveData2HBase(tableName:String,outPut);
+    val outPut:Put = HbaseUtils.data2Put(new HBaseData())
+    val isSuccess = HbaseUtils.saveData2HBase(tableName:String,outPut);
   }
 
 

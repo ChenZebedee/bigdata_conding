@@ -13,14 +13,14 @@ import java.io.IOException;
 /**
  * Created by shaodi.chen on 2019/4/25.
  */
-public class PaReduce2 extends Reducer<Text, MapWritable, NullWritable, Text> {
+public class PaReduce31 extends Reducer<Text, MapWritable, NullWritable, Text> {
     @Override
     protected void reduce(Text key, Iterable<MapWritable> values, Context context) throws IOException, InterruptedException {
         MapWritable midWritable = new MapWritable();
         for (MapWritable value : values) {
             midWritable.putAll(value);
         }
-        context.write(NullWritable.get(), new Text(TableNameConst.PA_SECOND + PunctuationConst.SPLITTER_STR + HbaseUtils.mapWritable2JsonString(midWritable)));
+        context.write(NullWritable.get(), new Text(TableNameConst.PA_FIRST + PunctuationConst.SPLITTER_STR + HbaseUtils.mapWritable2JsonString(midWritable)));
 
 
     }

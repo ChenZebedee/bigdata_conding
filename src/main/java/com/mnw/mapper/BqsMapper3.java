@@ -3,7 +3,7 @@ package com.mnw.mapper;
 import com.mnw.data.constant.ColumnHeadConstant;
 import com.mnw.data.constant.PunctuationConst;
 import com.mnw.data.constant.TableNameConst;
-import com.mnw.utils.HBaseUtils;
+import com.mnw.utils.HbaseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.MapWritable;
@@ -42,7 +42,7 @@ public class BqsMapper3 extends Mapper<LongWritable, Text, Text, MapWritable> {
 
                 break;
             case TableNameConst.BQS_SECOND:
-                outValue = HBaseUtils.JsonString2MapWritable(columnData[1]);
+                outValue = HbaseUtils.JsonString2MapWritable(columnData[1]);
                 outKey.set(outValue.get(new Text(ColumnHeadConstant.BQS_STRATEGY + "f_query_data_id")).toString());
                 outValue.remove(new Text(ColumnHeadConstant.BQS_STRATEGY + "f_query_data_id"));
                 break;

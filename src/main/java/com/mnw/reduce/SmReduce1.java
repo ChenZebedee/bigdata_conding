@@ -7,7 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.mapreduce.TableReducer;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
@@ -17,7 +16,7 @@ import java.io.IOException;
 public class SmReduce1 extends TableReducer<Text, SmWritable, NullWritable> {
 
     @Override
-    protected void reduce(Text key, Iterable<SmWritable> values, Reducer.Context context) throws IOException, InterruptedException {
+    protected void reduce(Text key, Iterable<SmWritable> values, Context context) throws IOException, InterruptedException {
         SmWritable midWritable = new SmWritable();
         midWritable.setTableNameStr("smOut");
         if (CollectionUtils.size(values) < 2) {
