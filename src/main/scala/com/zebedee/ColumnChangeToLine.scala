@@ -81,6 +81,7 @@ object ColumnChangeToLine {
 
   def setHbaseData(): HBaseData ={
 
+
   }
 
   def saveData2Hbase(tableName:String): Unit ={
