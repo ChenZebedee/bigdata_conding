@@ -21,10 +21,11 @@ object ColumnChangeToLine {
   def main(args: Array[String]): Unit = {
     val configFileData1 = getFileData(args(0))
     val conf = new SparkConf().setAppName("paSpark")
-    val fileData1 = getRdd4File(configFileData1._1, conf, configFileData1._2, configFileData1._3, configFileData1._4)
+    val sc = new SparkContext(conf)
+    val fileData1 = getRdd4File(configFileData1._1, sc, configFileData1._2, configFileData1._3, configFileData1._4)
     val configFileData2 = getFileData(args(1))
-    val fileData2 = getRdd4File(configFileData2._1, conf, configFileData2._2, configFileData2._3, configFileData2._4)
-    val outData = fileData1.join(fileData2).map(value => {
+    val fileData2 = getRdd4File(configFileData2._1, sc, configFileData2._2, configFileData2._3, configFileData2._4)
+    fileData1.join(fileData2).map(value => {
       val outKey = value._1
       val outValue = value._2._1 ++ value._2._2
       (outKey, outValue)
@@ -52,8 +53,7 @@ object ColumnChangeToLine {
   }
 
 
-  def getRdd4File(filePath: String, conf: SparkConf, keyIndex: Int, data4ColumnIndex: Array[String], data4DataColumnMap: Map[Int, String]): RDD[(String, Map[String, String])] = {
-    val sc = new SparkContext(conf)
+  def getRdd4File(filePath: String,sc:SparkContext, keyIndex: Int, data4ColumnIndex: Array[String], data4DataColumnMap: Map[Int, String]): RDD[(String, Map[String, String])] = {
     val dataFile = sc.textFile(filePath)
     val value: RDD[(String, Map[String, String])] = dataFile.map(line => line.split(PunctuationConst.SPLITTER_USE)).map(dataArray => {
       val outKey = dataArray(keyIndex)
@@ -85,7 +85,7 @@ object ColumnChangeToLine {
 
   def saveData2Hbase(tableName:String): Unit ={
     val outPut:Put = HbaseUtils.data2Put(new HBaseData())
-    val isSuccess = HbaseUtils.saveData2HBase(tableName:String,outPut);
+    val isSuccess = HbaseUtils.saveData2HBase(tableName:String,outPut)
   }
 
 
