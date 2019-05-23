@@ -30,7 +30,7 @@ object ColumnChangeToLine {
       val outValue = value._2._1 ++ value._2._2
       (outKey, outValue)
     }).reduceByKey((a, b) => a ++ b).map(outData => {
-      "2"+PunctuationConst.SPLITTER_STR+JSON.toJSONString(outData._2)
+      "2" + PunctuationConst.SPLITTER_STR + JSON.toJSONString(outData._2)
     }).saveAsTextFile(args(2))
   }
 
@@ -53,7 +53,7 @@ object ColumnChangeToLine {
   }
 
 
-  def getRdd4File(filePath: String,sc:SparkContext, keyIndex: Int, data4ColumnIndex: Array[String], data4DataColumnMap: Map[Int, String]): RDD[(String, Map[String, String])] = {
+  def getRdd4File(filePath: String, sc: SparkContext, keyIndex: Int, data4ColumnIndex: Array[String], data4DataColumnMap: Map[Int, String]): RDD[(String, Map[String, String])] = {
     val dataFile = sc.textFile(filePath)
     val value: RDD[(String, Map[String, String])] = dataFile.map(line => line.split(PunctuationConst.SPLITTER_USE)).map(dataArray => {
       val outKey = dataArray(keyIndex)
@@ -75,17 +75,22 @@ object ColumnChangeToLine {
     value
   }
 
-  def scendDataDeal(data:String): Map[String,String] ={
-    JSON.parseObject(data,Map[String,String].getClass)
+  def scendDataDeal(keyName: String, data: String): (String, Map[String, String]) = {
+    val outMap: Map[String,String] = JSON.parseObject(data, Map[String, String].getClass)
+    var outKey:String =""
+    if (outMap.contains(keyName)){
+      outKey=outMap.get(keyName).toString()
+    }
+    (outKey,outMap)
   }
 
-  def setHbaseData(): HBaseData ={
+  def setHbaseData(): HBaseData = {
 
   }
 
-  def saveData2Hbase(tableName:String): Unit ={
-    val outPut:Put = HbaseUtils.data2Put(new HBaseData())
-    val isSuccess = HbaseUtils.saveData2HBase(tableName:String,outPut)
+  def saveData2Hbase(tableName: String): Unit = {
+    val outPut: Put = HbaseUtils.data2Put(new HBaseData())
+    val isSuccess = HbaseUtils.saveData2HBase(tableName: String, outPut)
   }
 
 
