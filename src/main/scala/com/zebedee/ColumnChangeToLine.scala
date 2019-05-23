@@ -6,7 +6,7 @@ import java.util.Properties
 import com.alibaba.fastjson.JSON
 import com.mnw.data.config.HBaseData
 import com.mnw.data.constant.PunctuationConst
-import com.mnw.utils.{FileUtils, HbaseUtils}
+import com.mnw.utils.{DataUtils, FileUtils, HbaseUtils}
 import org.apache.commons.lang3.StringUtils
 import org.apache.hadoop.hbase.client.Put
 import org.apache.spark.rdd.RDD
@@ -29,9 +29,9 @@ object ColumnChangeToLine {
       val outKey = value._1
       val outValue = value._2._1 ++ value._2._2
       (outKey, outValue)
-    }).reduceByKey((a, b) => a ++ b).map(outData => {
-      "2" + PunctuationConst.SPLITTER_STR + JSON.toJSONString(outData._2)
-    }).saveAsTextFile(args(2))
+    }).reduceByKey((a, b) => a ++ b).map(outData =>
+      "2" + PunctuationConst.SPLITTER_STR + DataUtils.map2JSONString(outData._2)
+    ).saveAsTextFile(args(2))
   }
 
 
@@ -53,45 +53,54 @@ object ColumnChangeToLine {
   }
 
 
-  def getRdd4File(filePath: String, sc: SparkContext, keyIndex: Int, data4ColumnIndex: Array[String], data4DataColumnMap: Map[Int, String]): RDD[(String, Map[String, String])] = {
+  def getRdd4File(filePath: String, sc: SparkContext, keyIndex: Int, data4ColumnIndex: Array[String],
+                  data4DataColumnMap: Map[Int, String]): RDD[(String, Map[String, String])] = {
     val dataFile = sc.textFile(filePath)
-    val value: RDD[(String, Map[String, String])] = dataFile.map(line => line.split(PunctuationConst.SPLITTER_USE)).map(dataArray => {
-      val outKey = dataArray(keyIndex)
-      val outMap: Map[String, String] = Map()
+    val value: RDD[(String, Map[String, String])] = dataFile.map(line =>
+      line.split(PunctuationConst.SPLITTER_USE)).map(dataArray => {
+      if (dataArray(0).equals("2")) {
+        scendDataDeal(data4DataColumnMap.get(keyIndex).toString, dataArray(1))
+      } else {
+        val outKey = dataArray(keyIndex)
+        val outMap: Map[String, String] = Map()
 
-      val outMapKeyList: util.ArrayList[String] = new util.ArrayList[String]()
-      for (columnIndex <- data4ColumnIndex) {
-        outMapKeyList.add(dataArray(Integer.parseInt(columnIndex)))
+        val outMapKeyList: util.ArrayList[String] = new util.ArrayList[String]()
+        for (columnIndex <- data4ColumnIndex) {
+          outMapKeyList.add(dataArray(Integer.parseInt(columnIndex)))
+        }
+
+        val headColumnName = StringUtils.join(outMapKeyList, "__")
+        for (dataIndex <- data4DataColumnMap.keySet) {
+          outMap.+(headColumnName + "__" + data4DataColumnMap.get(dataIndex) -> dataArray(dataIndex))
+        }
+
+        (outKey, outMap)
       }
-
-      val headColumnName = StringUtils.join(outMapKeyList, "__")
-      for (dataIndex <- data4DataColumnMap.keySet) {
-        outMap.+(headColumnName + "__" + data4DataColumnMap.get(dataIndex) -> dataArray(dataIndex))
-      }
-
-      (outKey, outMap)
     })
 
     value
   }
 
   def scendDataDeal(keyName: String, data: String): (String, Map[String, String]) = {
-    val outMap: Map[String,String] = JSON.parseObject(data, Map[String, String].getClass)
-    var outKey:String =""
-    if (outMap.contains(keyName)){
-      outKey=outMap.get(keyName).toString()
+    val outMap: Map[String, String] = DataUtils.jsonString2Map(data)
+    var outKey: String = ""
+    if (outMap.contains(keyName)) {
+      outKey = outMap.get(keyName).toString()
     }
-    (outKey,outMap)
+    (outKey, outMap)
   }
 
-  def setHbaseData(): HBaseData = {
-
+  def setHbaseData(rowKey: String, columnName: String, data: util.Map[String, String]): HBaseData = {
+    new HBaseData(rowKey, columnName, data)
   }
 
-  def saveData2Hbase(tableName: String): Unit = {
-    val outPut: Put = HbaseUtils.data2Put(new HBaseData())
+  def saveData2Hbase(tableName: String, hbaseData: HBaseData): Unit = {
+    val outPut: Put = HbaseUtils.data2Put(hbaseData)
     val isSuccess = HbaseUtils.saveData2HBase(tableName: String, outPut)
   }
 
 
 }
+
+
+
