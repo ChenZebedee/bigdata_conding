@@ -98,6 +98,7 @@ object ColumnChangeToLine {
         val isSuccess = HbaseUtils.saveData2HBase(tableName: String, outPut)
     }
 
+}
 
 
 
