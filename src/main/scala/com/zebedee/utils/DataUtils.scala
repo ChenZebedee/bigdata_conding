@@ -1,5 +1,7 @@
 package com.zebedee.utils
 
+import java.util
+
 import com.alibaba.fastjson.JSON
 
 /**
@@ -9,8 +11,6 @@ import com.alibaba.fastjson.JSON
   */
 class DataUtils {
 
-  def map2JsonStr(map: Map[String,String]): String ={
-    JSON.toJSONString(map)
-  }
+
 
 }
