@@ -99,12 +99,7 @@ object ColumnChangeToLine {
     }
 
 
-<<<<<<< HEAD
 
-  }
-=======
-}
->>>>>>> bc0a617d7cec6777ad93ddee103c5ee38370cbcc
 
 
 
