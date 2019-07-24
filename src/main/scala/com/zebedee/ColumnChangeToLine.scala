@@ -18,23 +18,17 @@ import org.apache.spark.{SparkConf, SparkContext}
   */
 object ColumnChangeToLine {
     def main(args: Array[String]): Unit = {
-        val configFileData1 = getFileData(args(0))
+        val configFileData1 = getFileConfigData(args(0))
         val conf = new SparkConf().setAppName("paSpark")
         val sc = new SparkContext(conf)
         val fileData1 = getRdd4File(configFileData1._1, sc, configFileData1._2, configFileData1._3, configFileData1._4)
-        val configFileData2 = getFileData(args(1))
-        val fileData2 = getRdd4File(configFileData2._1, sc, configFileData2._2, configFileData2._3, configFileData2._4)
-        fileData1.join(fileData2).map(value => {
-            val outKey = value._1
-            val outValue = value._2._1 ++ value._2._2
-            (outKey, outValue)
-        }).reduceByKey((a, b) => a ++ b).map(outData =>
-            "2" + PunctuationConst.SPLITTER_STR + DataUtils.map2JSONString(outData._2)
-        ).saveAsTextFile(args(2))
+        sc.addFile()
+
+
     }
 
 
-    def getFileData(prefixName: String): (String, Int, Array[String], Map[Int, String]) = {
+    def getFileConfigData(prefixName: String): (String, Int, Array[String], Map[Int, String]) = {
         val fileUtils: Properties = FileUtils.getPropertiesData()
         val filePath: String = String.valueOf(fileUtils.get(prefixName + "_file_path"))
         val keyColumnIndex = Integer.parseInt(String.valueOf(fileUtils.get(prefixName + "_key_index")))
@@ -57,9 +51,6 @@ object ColumnChangeToLine {
         val dataFile = sc.textFile(filePath)
         val value: RDD[(String, Map[String, String])] = dataFile.map(line =>
             line.split(PunctuationConst.SPLITTER_USE)).map(dataArray => {
-            if (dataArray(0).equals("2")) {
-                scendDataDeal(data4DataColumnMap.get(keyIndex).toString, dataArray(1))
-            } else {
                 val outKey = dataArray(keyIndex)
                 val outMap: Map[String, String] = Map()
 
@@ -74,7 +65,6 @@ object ColumnChangeToLine {
                 }
 
                 (outKey, outMap)
-            }
         })
 
         value
