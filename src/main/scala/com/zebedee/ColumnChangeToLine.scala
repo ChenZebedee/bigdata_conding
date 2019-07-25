@@ -22,7 +22,6 @@ object ColumnChangeToLine {
         val conf = new SparkConf().setAppName("paSpark")
         val sc = new SparkContext(conf)
         val fileData1 = getRdd4File(configFileData1._1, sc, configFileData1._2, configFileData1._3, configFileData1._4)
-        sc.addFile()
 
 
     }

@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils
   */
 object TransformColumnToHBase {
     def main(args: Array[String]): Unit = {
-        val configFileData = getFileData(args[0]);
     }
 
     def getFileData(prefixName: String): (String, Int, Array[String], Map[Int, String]) = {
