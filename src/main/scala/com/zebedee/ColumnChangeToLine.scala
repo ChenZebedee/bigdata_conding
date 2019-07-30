@@ -84,7 +84,7 @@ object ColumnChangeToLine {
 
     def saveData2Hbase(tableName: String, hbaseData: HBaseData): Unit = {
         val outPut: Put = HbaseUtils.data2Put(hbaseData)
-        val isSuccess = HbaseUtils.saveData2HBase(tableName: String, outPut)
+        val isSuccess = HbaseUtils.saveData2Hbase(tableName: String, outPut)
     }
 
 }

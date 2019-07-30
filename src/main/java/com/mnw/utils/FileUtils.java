@@ -9,7 +9,11 @@ import java.util.Properties;
  */
 public class FileUtils {
 
+    /**
+     * The Properties.
+     */
     static Properties properties = new Properties();
+
     static {
         InputStream inputStream = FileUtils.class.getClassLoader().getResourceAsStream("table-info.properties");
         try {

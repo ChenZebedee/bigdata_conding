@@ -73,11 +73,11 @@ public class PaMr extends Configured implements Tool {
         conf.set("inPath10", strings[9]);
         conf.set(TableOutputFormat.OUTPUT_TABLE, strings[10]);
         conf.set("ColumnName", strings[11]);
-        conf.set("outPath1","/OVERDUE_GET1");
-        conf.set("outPath2","/OVERDUE_GET2");
-        conf.set("outPath3","/LOAN_GET1");
-        conf.set("outPath4","/LOAN_GET2");
-        conf.set("outPath5","/BLACKLIST_GET");
+        conf.set("outPath1", "/OVERDUE_GET1");
+        conf.set("outPath2", "/OVERDUE_GET2");
+        conf.set("outPath3", "/LOAN_GET1");
+        conf.set("outPath4", "/LOAN_GET2");
+        conf.set("outPath5", "/BLACKLIST_GET");
         FileSystem dfs = FileSystem.get(conf);
 
         // 2.Create Job
@@ -166,7 +166,6 @@ public class PaMr extends Configured implements Tool {
         FileOutputFormat.setOutputPath(job3, outPath3);
 
 
-
         Job job4 = Job.getInstance(conf, "LOAN_GET2");
         job4.setJarByClass(PaMr.class);
         //job.setNumReduceTasks(1);
@@ -223,12 +222,11 @@ public class PaMr extends Configured implements Tool {
         FileOutputFormat.setOutputPath(job5, outPath5);
 
 
-
         Job job6 = Job.getInstance(conf, "outPaData");
         job6.setJarByClass(PaMr.class);
-        FileInputFormat.addInputPath(job6, new Path(conf.get("outPath5")+"/par*"));
-        FileInputFormat.addInputPath(job6, new Path(conf.get("outPath4")+"/par*"));
-        FileInputFormat.addInputPath(job6, new Path(conf.get("outPath2")+"/par*"));
+        FileInputFormat.addInputPath(job6, new Path(conf.get("outPath5") + "/par*"));
+        FileInputFormat.addInputPath(job6, new Path(conf.get("outPath4") + "/par*"));
+        FileInputFormat.addInputPath(job6, new Path(conf.get("outPath2") + "/par*"));
 
         FileInputFormat.addInputPath(job6, new Path(conf.get("inPath9")));
         FileInputFormat.addInputPath(job6, new Path(conf.get("inPath10")));
@@ -249,7 +247,7 @@ public class PaMr extends Configured implements Tool {
         }*/
 //        FileOutputFormat.setOutputPath(job, outPath1);
 
-        return (((job1.waitForCompletion(true) && job2.waitForCompletion(true) ) & (job3.waitForCompletion(true) && job4.waitForCompletion(true)) & (job5.waitForCompletion(true))) && job6.waitForCompletion(true)) ? 0 : 1;
+        return (((job1.waitForCompletion(true) && job2.waitForCompletion(true)) & (job3.waitForCompletion(true) && job4.waitForCompletion(true)) & (job5.waitForCompletion(true))) && job6.waitForCompletion(true)) ? 0 : 1;
     }
 
 }

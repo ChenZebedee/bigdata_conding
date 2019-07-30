@@ -136,6 +136,22 @@ public class PunctuationConst {
      * The constant VERTICAL_LINE.
      */
     public static final String VERTICAL_LINE = "|";
+    /**
+     * The constant TABS.
+     */
+    public static final String TABS          = "\t";
+    /**
+     * The constant FOUR_INT.
+     */
+    public static final int    FOUR_INT      = 4;
+    /**
+     * The constant ONE_INT.
+     */
+    public static final int    ONE_INT       = 1;
+    /**
+     * The constant THREE_INT.
+     */
+    public static final int    THREE_INT     = 3;
 
 
 }

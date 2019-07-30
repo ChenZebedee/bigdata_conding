@@ -35,8 +35,15 @@ public class HBaseData {
         this.columnsName = columnsName;
     }
 
-    public HBaseData(String rowKey,String columnsName,Map<String,String> dataMap){
-        this(rowKey,columnsName);
+    /**
+     * Instantiates a new H base data.
+     *
+     * @param rowKey      the row key
+     * @param columnsName the columns name
+     * @param dataMap     the data map
+     */
+    public HBaseData(String rowKey, String columnsName, Map<String, String> dataMap) {
+        this(rowKey, columnsName);
         this.dataMap = dataMap;
     }
 

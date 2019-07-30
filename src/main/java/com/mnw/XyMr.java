@@ -1,14 +1,11 @@
 package com.mnw;
 
-import com.mnw.mapper.SmMapper1;
 import com.mnw.mapper.XyMapper;
-import com.mnw.reduce.SmReduce1;
 import com.mnw.reduce.XyReduce;
 import com.mnw.utils.HbaseUtils;
 import com.mnw.writable.SmWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.io.Text;
@@ -20,7 +17,6 @@ import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.Date;
 
 /**
@@ -64,7 +60,7 @@ public class XyMr extends Configured implements Tool {
         conf.set(TableOutputFormat.OUTPUT_TABLE, strings[2]);
 
         // 2.Create Job
-        Job job       = Job.getInstance(conf, "GetXyData");
+        Job job = Job.getInstance(conf, "GetXyData");
         job.setJarByClass(getClass());
         job.setPartitionerClass(HashPartitioner.class);
 

@@ -47,46 +47,56 @@ public class HbaseUtils {
         }
     }
 
+    /**
+     * Gets conn.
+     *
+     * @return the conn
+     */
     public static Connection getConn() {
         return connection;
     }
 
-    public static boolean saveData2HBase(String tableName,Put put){
-        boolean isSuccess = false;
-        try(HTable hTable = (HTable) connection.getTable(TableName.valueOf(tableName))){
-            hTable.put(put);
-            isSuccess=true;
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return isSuccess;
-    }
-
-
-    public static boolean saveData2HBase(String tableName, List<Put> putList) {
+    /**
+     * Save data 2 hbase boolean.
+     *
+     * @param tableName the table name
+     * @param put       the put
+     * @return the boolean
+     */
+    public static boolean saveData2Hbase(String tableName, Put put) {
         boolean isSuccess = false;
         try (HTable hTable = (HTable) connection.getTable(TableName.valueOf(tableName))) {
-            hTable.setAutoFlushTo(false);
-            hTable.setWriteBufferSize(100 * 1024 * 1024);
-            hTable.put(putList);
-            hTable.flushCommits();
-            isSuccess=true;
+            hTable.put(put);
+            isSuccess = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return isSuccess;
     }
 
+
     /**
-     * Gets row key.
+     * Save data 2 hbase boolean.
      *
-     * @param indexs the indexs
-     * @param fields the fields
-     * @return the row key
+     * @param tableName the table name
+     * @param putList   the put list
+     * @return the boolean
      */
-    public static String getRowKey(String indexs, String[] fields) {
-        return fields[Integer.parseInt(indexs)];
+    public static boolean saveData2Hbase(String tableName, List<Put> putList) {
+        boolean isSuccess = false;
+        try (HTable hTable = (HTable) connection.getTable(TableName.valueOf(tableName))) {
+            hTable.setAutoFlushTo(false);
+            hTable.setWriteBufferSize(100 * 1024 * 1024);
+            hTable.put(putList);
+            hTable.flushCommits();
+            isSuccess = true;
+        } catch (IOException e) {
+            isSuccess = false;
+            e.printStackTrace();
+        }
+        return isSuccess;
     }
+
 
     /**
      * Data 2 put put.
@@ -118,7 +128,7 @@ public class HbaseUtils {
         for (int index : indexs) {
             columnList.add(columnMapping.get(dataList.get(index)));
         }
-        Map<String, String> outMap = new HashMap<>();
+        Map<String, String> outMap = new HashMap<>(1);
         outMap.put(StringUtils.join(columnList, PunctuationConst.DOUBLE_UNDERLINE), value);
         return outMap;
     }
@@ -201,14 +211,11 @@ public class HbaseUtils {
      * @throws IOException the io exception
      */
     public static Map<String, Map<String, String>> qurryTableTestBatch(String tableName, List<String> rowkeyList) throws IOException {
-        List<Get>                        getList    = new ArrayList();
         Connection                       connection = getConnection();
         Table                            table      = connection.getTable(TableName.valueOf(tableName));
         Map<String, Map<String, String>> outMap     = new HashMap<>();
-        for (String rowkey : rowkeyList) {
-            Get get = new Get(Bytes.toBytes(rowkey));
-            getList.add(get);
-        }
+        List<Get>                        getList    = rowKeyList2GetList(rowkeyList);
+
         Result[] results = table.get(getList);
         for (Result result : results) {
             Map<String, String> dataMap = new HashMap<>();
@@ -221,6 +228,48 @@ public class HbaseUtils {
             outMap.put(Bytes.toString(result.getRow()), dataMap);
         }
         return outMap;
+    }
+
+    /**
+     * Query table row key exists int.
+     * 批量判断 rowKey 是否存在
+     *
+     * @param tableName  the table name
+     * @param rowKeyList the row key list
+     * @return the int
+     */
+    public static int queryTableRowKeyExists(String tableName, List<String> rowKeyList) {
+        int existsNum = 0;
+        try {
+            Table     table            = connection.getTable(TableName.valueOf(tableName));
+            List<Get> getList          = rowKeyList2GetList(rowKeyList);
+            boolean[] getBooleanValues = table.existsAll(getList);
+
+            for (boolean isExists : getBooleanValues) {
+                if (isExists) {
+                    existsNum++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return existsNum;
+    }
+
+    /**
+     * Row key list 2 get list list.
+     *
+     * @param rowKeyList the row key list
+     * @return the list
+     */
+    static List<Get> rowKeyList2GetList(List<String> rowKeyList) {
+        List<Get> getList = new ArrayList<>();
+        for (String rowKey : rowKeyList) {
+            Get get = new Get(Bytes.toBytes(rowKey));
+            getList.add(get);
+        }
+
+        return getList;
     }
 
 
@@ -340,45 +389,6 @@ public class HbaseUtils {
         }
     }
 
-
-    /**
-     * Map writable 2 string string.
-     *
-     * @param mapWritable the map writable
-     * @param columns     the columns
-     * @param tableName   the table name
-     * @return the string
-     */
-    public static String mapWritable2String(MapWritable mapWritable, String columns, String tableName) {
-        String[]     columnList = StringUtils.split(columns, PunctuationConst.COMMA);
-        List<String> dataList   = new ArrayList<>();
-        dataList.add(tableName);
-        for (String column : columnList) {
-            if (mapWritable.containsKey(column)) {
-                dataList.add(mapWritable.get(column).toString());
-            } else {
-                dataList.add("NULL");
-            }
-        }
-        return StringUtils.join(dataList, PunctuationConst.SPLITTER_USE);
-    }
-
-    /**
-     * String 2 map writable map writable.
-     *
-     * @param data    the data
-     * @param columns the columns
-     * @return the map writable
-     */
-    public static MapWritable string2MapWritable(String data, String columns) {
-        List<String> dataList    = Arrays.asList(StringUtils.split(data, PunctuationConst.SPLITTER_USE, -1));
-        List<String> columnList  = Arrays.asList(StringUtils.split(columns, PunctuationConst.COMMA, -1));
-        MapWritable  mapWritable = new MapWritable();
-        for (int i = 0; i < columnList.size(); i++) {
-            mapWritable.put(new Text(columnList.get(i)), new Text(dataList.get(i + 1)));
-        }
-        return mapWritable;
-    }
 
     /**
      * Map writable 2 json string string.

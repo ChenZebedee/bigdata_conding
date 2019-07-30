@@ -17,8 +17,8 @@ import java.io.IOException;
  */
 public class PaMapper3 extends Mapper<LongWritable, Text, Text, MapWritable> {
 
-    private Text                              outKey           = new Text();
-    private MapWritable                       outValue         = new MapWritable();
+    private Text        outKey   = new Text();
+    private MapWritable outValue = new MapWritable();
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {

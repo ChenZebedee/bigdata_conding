@@ -17,8 +17,8 @@ import java.io.IOException;
  */
 public class PaMapper2 extends Mapper<LongWritable, Text, Text, MapWritable> {
 
-    private Text                              outKey           = new Text();
-    private MapWritable                       outValue         = new MapWritable();
+    private Text        outKey   = new Text();
+    private MapWritable outValue = new MapWritable();
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -31,7 +31,7 @@ public class PaMapper2 extends Mapper<LongWritable, Text, Text, MapWritable> {
                 break;
             case TableNameConst.T_3RDAPI_PA_OVERDUE_QUERY_DATA:
                 outKey.set(columnData[1]);
-                outValue.put(new Text( "f_query_data_id"), new Text(columnData[2]));
+                outValue.put(new Text("f_query_data_id"), new Text(columnData[2]));
                 break;
             default:
                 outKey.set("N");

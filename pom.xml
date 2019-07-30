@@ -44,7 +44,7 @@
     <hive.version>2.3.4</hive.version>
     <flink.version>1.7.0</flink.version>
     <spark.pom.scope>compile</spark.pom.scope>
-    <pinyin4j.version>2.5.0</pinyin4j.version>
+    <pinyin4j.version>2.5.1</pinyin4j.version>
   </properties>
 
 
@@ -245,7 +245,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-collections4</artifactId>
-      <version>4.3</version>
+      <version>4.4</version>
     </dependency>
 
     <!-- the commom -->
