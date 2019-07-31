@@ -23,7 +23,7 @@ public class GetData {
         String       outFilePath    = args[4];
 
         try {
-            Map<String, Map<String, String>> getDataMap = HbaseUtils.qurryTableTestBatch(tableName, rowKeyList);
+            Map<String, Map<String, String>> getDataMap = HbaseUtils.queryTableTestBatch(tableName, rowKeyList);
             /*for (Map.Entry<String,Map<String,String>> getDataEntry:getDataMap.entrySet()){
                 String outStr=getDataEntry.getKey()+","+HbaseUtils.map2String("table-info.properties","sm_out",getDataEntry.getValue());
                 HbaseUtils.addData2File("/home/hadoop/data/get/sm_out",outStr);

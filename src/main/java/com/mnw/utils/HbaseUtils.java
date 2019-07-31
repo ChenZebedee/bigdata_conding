@@ -8,10 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.protobuf.generated.HBaseProtos;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
@@ -84,13 +83,21 @@ public class HbaseUtils {
      */
     public static boolean saveData2Hbase(String tableName, List<Put> putList) {
         boolean isSuccess = false;
-        try (HTable hTable = (HTable) connection.getTable(TableName.valueOf(tableName))) {
+        try (Connection connection = getConnection();
+             Admin admin = connection.getAdmin();
+                ) {
+            if (!admin.tableExists(TableName.valueOf(tableName))){
+                HTableDescriptor hTableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));
+                hTableDescriptor.addFamily(new HColumnDescriptor("info"));
+               admin.createTable(hTableDescriptor);
+            }
+            HTable hTable = (HTable) connection.getTable(TableName.valueOf(tableName));
             hTable.setAutoFlushTo(false);
             hTable.setWriteBufferSize(100 * 1024 * 1024);
             hTable.put(putList);
             hTable.flushCommits();
             isSuccess = true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             isSuccess = false;
             e.printStackTrace();
         }
@@ -202,6 +209,25 @@ public class HbaseUtils {
     }
 
 
+    public static void sumExistsColumn(String tableName, String familyName, String insertFamilyName, String insertColumnName, List<String> rowKeyList) {
+        try {
+            Map<String, Map<String, String>> dataMap    = queryTableTestBatch(tableName, familyName, rowKeyList);
+            Connection                       connection = getConnection();
+            Table                            table      = connection.getTable(TableName.valueOf(tableName));
+            List<Put>                        putList    = new ArrayList<>();
+            for (String rowKey : rowKeyList) {
+                Put put = new Put(Bytes.toBytes(rowKey));
+                put.addColumn(Bytes.toBytes(insertFamilyName), Bytes.toBytes(insertColumnName), Bytes.toBytes(dataMap.get(rowKey).size()));
+                putList.add(put);
+            }
+            table.put(putList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     /**
      * Qurry table test batch map.
      *
@@ -210,7 +236,7 @@ public class HbaseUtils {
      * @return the map
      * @throws IOException the io exception
      */
-    public static Map<String, Map<String, String>> qurryTableTestBatch(String tableName, List<String> rowkeyList) throws IOException {
+    public static Map<String, Map<String, String>> queryTableTestBatch(String tableName, List<String> rowkeyList) throws IOException {
         Connection                       connection = getConnection();
         Table                            table      = connection.getTable(TableName.valueOf(tableName));
         Map<String, Map<String, String>> outMap     = new HashMap<>();
@@ -230,6 +256,30 @@ public class HbaseUtils {
         return outMap;
     }
 
+    public static Map<String, Map<String, String>> queryTableTestBatch(String tableName, String familyName, List<String> rowKeyList) {
+        Map<String, Map<String, String>> outMap = new HashMap<>();
+        try {
+            Connection connection = getConnection();
+            Table      table      = connection.getTable(TableName.valueOf(tableName));
+            List<Get>  getList    = rowKeyList2GetList(rowKeyList, familyName);
+            Result[]   results    = table.get(getList);
+            for (Result result : results) {
+                Map<String, String> dataMap = new HashMap<>();
+                if (result.isEmpty()) {
+                    continue;
+                }
+                for (Cell kv : result.rawCells()) {
+                    dataMap.put(Bytes.toString(CellUtil.cloneQualifier(kv)), Bytes.toString(CellUtil.cloneValue(kv)));
+                }
+                outMap.put(Bytes.toString(result.getRow()), dataMap);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return outMap;
+
+    }
+
     /**
      * Query table row key exists int.
      * 批量判断 rowKey 是否存在
@@ -241,9 +291,10 @@ public class HbaseUtils {
     public static int queryTableRowKeyExists(String tableName, List<String> rowKeyList) {
         int existsNum = 0;
         try {
-            Table     table            = connection.getTable(TableName.valueOf(tableName));
-            List<Get> getList          = rowKeyList2GetList(rowKeyList);
-            boolean[] getBooleanValues = table.existsAll(getList);
+            Connection connection       = getConnection();
+            Table      table            = connection.getTable(TableName.valueOf(tableName));
+            List<Get>  getList          = rowKeyList2GetList(rowKeyList);
+            boolean[]  getBooleanValues = table.existsAll(getList);
 
             for (boolean isExists : getBooleanValues) {
                 if (isExists) {
@@ -254,6 +305,38 @@ public class HbaseUtils {
             e.printStackTrace();
         }
         return existsNum;
+    }
+
+    public static List<String> queryTableRowKey(String tableName) {
+        List<String> rowKeyList = new ArrayList<>();
+        try {
+            Connection connection = getConnection();
+            Table      table      = connection.getTable(TableName.valueOf(tableName));
+            Scan scan = new Scan();
+            scan.setBatch(1000);
+            ResultScanner scanner = table.getScanner(scan);
+            for (Result data:scanner){
+                rowKeyList.add(Bytes.toString(data.getRow()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return rowKeyList;
+    }
+
+    public static List<String> listTableName(String nameSpace){
+        List<String> tableNameList = new ArrayList<>();
+        try {
+            Connection       connection = getConnection();
+            Admin            admin = connection.getAdmin();
+            HTableDescriptor[] hTableDescriptors = admin.listTableDescriptorsByNamespace(nameSpace);
+            for (HTableDescriptor hTableDescriptor:hTableDescriptors){
+                tableNameList.add(hTableDescriptor.getNameAsString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return tableNameList;
     }
 
     /**
@@ -269,6 +352,29 @@ public class HbaseUtils {
             getList.add(get);
         }
 
+        return getList;
+    }
+
+    static List<Get> rowKeyList2GetList(List<String> rowKeyList, String familyName) {
+        List<Get> getList        = new ArrayList<>();
+        byte[]    familyNameByte = Bytes.toBytes(familyName);
+        for (String rowKey : rowKeyList) {
+            Get get = new Get(Bytes.toBytes(rowKey));
+            get.addFamily(familyNameByte);
+            getList.add(get);
+        }
+        return getList;
+    }
+
+    static List<Get> rowKeyList2GetList(List<String> rowKeyList, String familyName, String columnName) {
+        List<Get> getList        = new ArrayList<>();
+        byte[]    familyNameByte = Bytes.toBytes(familyName);
+        byte[]    columnNameByte = Bytes.toBytes(columnName);
+        for (String rowKey : rowKeyList) {
+            Get get = new Get(Bytes.toBytes(rowKey));
+            get.addColumn(familyNameByte, columnNameByte);
+            getList.add(get);
+        }
         return getList;
     }
 
@@ -483,5 +589,6 @@ public class HbaseUtils {
         return cacheData;
 
     }
+
 
 }

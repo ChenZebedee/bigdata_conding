@@ -5,10 +5,14 @@ import com.mnw.utils.DataUtils;
 import com.mnw.utils.HbaseUtils;
 import com.mnw.writable.ContactWritable;
 import com.mnw.writable.PhoneWritable;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 
+import javax.xml.crypto.Data;
 import javax.xml.soap.Text;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +30,10 @@ public class Phone2HBaseReduce extends Reducer<Text, Text, NullWritable, Text> {
         List<Put> wideTablePutList = new ArrayList<>();
         String    userId           = "";
         for (Text value : values) {
-            if (DataUtils.isJson(value.toString())) {
-                PhoneWritable contactList = JSON.parseObject(value.toString(), PhoneWritable.class);
+            String valueIn = value.toString();
+            if (DataUtils.isJson(valueIn)) {
+                String valueStr = DataUtils.phoneFormat(valueIn);
+                PhoneWritable contactList = JSON.parseObject(valueStr, PhoneWritable.class);
                 for (ContactWritable contact : contactList.getPhoneMapList()) {
                     String rowKeyStr      = contact.getPhone();
                     String nameColumnData = contact.getName();
@@ -36,7 +42,7 @@ public class Phone2HBaseReduce extends Reducer<Text, Text, NullWritable, Text> {
                     userTablePutList.add(putContact);
                 }
             } else {
-                userId = value.toString();
+                userId = valueIn;
             }
         }
 
@@ -50,4 +56,5 @@ public class Phone2HBaseReduce extends Reducer<Text, Text, NullWritable, Text> {
         HbaseUtils.saveData2Hbase("3rdapi:phoneWideTable", wideTablePutList);
 
     }
+
 }

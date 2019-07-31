@@ -65,4 +65,12 @@ public class DataUtils {
         }
         return result;
     }
+
+    public static String phoneFormat(String phone){
+        return phone.replace("\u00a0", "").
+                replace(" ", "").
+                replace("+86", "").
+                replace("-", "").
+                replaceAll("^86","");
+    }
 }

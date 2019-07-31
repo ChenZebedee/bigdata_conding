@@ -58,7 +58,6 @@ public class Phone2HBaseMr extends Configured implements Tool {
         conf.set("mapred.job.queue.name", "hadoop");
 
         conf.set("inPath1", args[1]);
-        conf.set("inPath2", args[2]);
         conf.set("outPath1", "/bqsOut1/");
         //conf.set("mapreduce.reduce.memory.mb","8190");
 
@@ -69,7 +68,6 @@ public class Phone2HBaseMr extends Configured implements Tool {
 //        job1.setNumReduceTasks(8);
         Path inPath1 = new Path(conf.get("inPath1"));
         FileInputFormat.addInputPath(job1, inPath1);
-        FileInputFormat.addInputPath(job1, new Path(conf.get("inPath2")));
 
         job1.setMapperClass(Phone2HBaseMapper.class);
         job1.setMapOutputKeyClass(Text.class);
