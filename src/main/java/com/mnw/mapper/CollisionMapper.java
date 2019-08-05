@@ -8,7 +8,6 @@ import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  *

@@ -29,17 +29,17 @@ public class PaMapper31 extends Mapper<LongWritable, Text, Text, MapWritable> {
         switch (columnData[0]) {
             case TableNameConst.T_3RDAPI_PA_BLACKLIST_OTHERS:
                 outKey.set(columnData[2]);
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS + "f_org_overdue_period"), new Text(columnData[6]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS + "f_bank_overdue_period"), new Text(columnData[7]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS + "f_org_litigation"), new Text(columnData[8]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS + "f_bank_litigation"), new Text(columnData[9]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS + "f_org_one_month_overdue"), new Text(columnData[10]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS + "f_org_lost_contact"), new Text(columnData[11]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS + "f_bank_lost_contact"), new Text(columnData[12]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS +"f_org_overdue_period"), new Text(columnData[6]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS +"f_bank_overdue_period"), new Text(columnData[7]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS +"f_org_litigation"), new Text(columnData[8]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS +"f_bank_litigation"), new Text(columnData[9]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS +"f_org_one_month_overdue"), new Text(columnData[10]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS +"f_org_lost_contact"), new Text(columnData[11]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_BLACKLIST_OTHERS +"f_bank_lost_contact"), new Text(columnData[12]));
                 break;
             case TableNameConst.T_3RDAPI_PA_BLACKLIST_QUERY_DATA:
                 outKey.set(columnData[1]);
-                outValue.put(new Text("f_query_data_id"), new Text(columnData[2]));
+                outValue.put(new Text( "f_query_data_id"), new Text(columnData[2]));
                 break;
             default:
                 outKey.set("N");
@@ -48,6 +48,7 @@ public class PaMapper31 extends Mapper<LongWritable, Text, Text, MapWritable> {
         }
         if (!StringUtils.equals(outKey.toString(), "N") || !StringUtils.equals(outKey.toString(), "\\N") || !StringUtils.equals(outKey.toString(), "NULL")) {
             context.write(outKey, outValue);
+            outValue.clear();
         }
     }
 }

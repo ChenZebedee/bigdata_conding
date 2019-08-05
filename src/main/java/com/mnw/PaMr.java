@@ -23,6 +23,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.util.Date;
 
 /**
@@ -229,25 +230,34 @@ public class PaMr extends Configured implements Tool {
         FileInputFormat.addInputPath(job6, new Path(conf.get("outPath2") + "/par*"));
 
         FileInputFormat.addInputPath(job6, new Path(conf.get("inPath9")));
-        FileInputFormat.addInputPath(job6, new Path(conf.get("inPath10")));
 
-        job6.setMapperClass(PaMapper3.class);
-        job6.setMapOutputKeyClass(Text.class);
-        job6.setMapOutputValueClass(MapWritable.class);
+        if (strings[12].equals("mlp")) {
+            job6.setJobName("mlpOutPaData");
+            job6.addCacheFile(new URI("hdfs://data3:9000" + conf.get("inPath10")));
 
-        job6.setNumReduceTasks(50);
-        job6.setReducerClass(PaReduce3.class);
-        job6.setOutputFormatClass(TableOutputFormat.class);
+            job6.setMapperClass(MlpPaMapper3.class);
+            job6.setMapOutputKeyClass(Text.class);
+            job6.setMapOutputValueClass(MapWritable.class);
+
+            job6.setReducerClass(MlpPaReduce3.class);
+            job6.setOutputFormatClass(TableOutputFormat.class);
+
+        }else{
+            FileInputFormat.addInputPath(job6, new Path(conf.get("inPath10")));
+            job6.setMapperClass(PaMapper3.class);
+            job6.setMapOutputKeyClass(Text.class);
+            job6.setMapOutputValueClass(MapWritable.class);
+
+            job6.setNumReduceTasks(50);
+            job6.setReducerClass(PaReduce3.class);
+            job6.setOutputFormatClass(TableOutputFormat.class);
+        }
 
 
 
-        /*Path outPath1 = new Path(conf.get("smOut"));
-        if (dfs.exists(outPath1)) {
-            dfs.delete(outPath1, true);
-        }*/
-//        FileOutputFormat.setOutputPath(job, outPath1);
 
-        return (((job1.waitForCompletion(true) && job2.waitForCompletion(true)) & (job3.waitForCompletion(true) && job4.waitForCompletion(true)) & (job5.waitForCompletion(true))) && job6.waitForCompletion(true)) ? 0 : 1;
+            return (((job1.waitForCompletion(true) && job2.waitForCompletion(true)) & (job3.waitForCompletion(true) && job4.waitForCompletion(true)) & (job5.waitForCompletion(true))) && job6.waitForCompletion(true)) ? 0 : 1;
+
     }
 
 }

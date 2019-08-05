@@ -29,10 +29,10 @@ public class PaMapper21 extends Mapper<LongWritable, Text, Text, MapWritable> {
         switch (columnData[0]) {
             case TableNameConst.T_3RDAPI_PA_LOAN_CLASSIFICATION:
                 outKey.set(columnData[2]);
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_LOAN_CLASSIFICATION + columnData[3] + "__" + columnData[4] + "__f_org_nums"), new Text(columnData[5]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_LOAN_CLASSIFICATION + columnData[3] + "__" + columnData[4] + "__f_loan_amount"), new Text(columnData[6]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_LOAN_CLASSIFICATION + columnData[3] + "__" + columnData[4] + "__f_total_amount"), new Text(columnData[7]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_LOAN_CLASSIFICATION + columnData[3] + "__" + columnData[4] + "__f_repay_amount"), new Text(columnData[8]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_LOAN_CLASSIFICATION +  columnData[3] + "__" + columnData[4] + "__f_org_nums"), new Text(columnData[5]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_LOAN_CLASSIFICATION +  columnData[3] + "__" + columnData[4] + "__f_loan_amount"), new Text(columnData[6]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_LOAN_CLASSIFICATION +  columnData[3] + "__" + columnData[4] + "__f_total_amount"), new Text(columnData[7]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_LOAN_CLASSIFICATION +  columnData[3] + "__" + columnData[4] + "__f_repay_amount"), new Text(columnData[8]));
                 break;
             case TableNameConst.T_3RDAPI_PA_LOAN_RECORD:
                 outKey.set(columnData[1]);
@@ -45,6 +45,7 @@ public class PaMapper21 extends Mapper<LongWritable, Text, Text, MapWritable> {
         }
         if (!StringUtils.equals(outKey.toString(), "N") || !StringUtils.equals(outKey.toString(), "\\N") || !StringUtils.equals(outKey.toString(), "NULL")) {
             context.write(outKey, outValue);
+            outValue.clear();
         }
     }
 }

@@ -1,19 +1,19 @@
 package com.mnw.reduce;
 
 import com.alibaba.fastjson.JSON;
+import com.mnw.data.constant.PunctuationConst;
 import com.mnw.utils.DataUtils;
 import com.mnw.utils.HbaseUtils;
 import com.mnw.writable.ContactWritable;
-import com.mnw.writable.PhoneWritable;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
+import org.apache.hadoop.hbase.mapreduce.TableReducer;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
+import org.apache.hadoop.io.Text;
 
-import javax.xml.crypto.Data;
-import javax.xml.soap.Text;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,38 +23,47 @@ import java.util.List;
  * @author shaodi.chen
  * @date 2019 /7/30
  */
-public class Phone2HBaseReduce extends Reducer<Text, Text, NullWritable, Text> {
+public class Phone2HBaseReduce extends TableReducer<Text, Text, NullWritable > {
+
+    Connection connection;
+    @Override
+    protected void setup(Context context) throws IOException, InterruptedException {
+        connection= HbaseUtils.getConnection();
+    }
+
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context) {
         List<Put> userTablePutList = new ArrayList<>();
         List<Put> wideTablePutList = new ArrayList<>();
         String    userId           = "";
         for (Text value : values) {
-            String valueIn = value.toString();
-            if (DataUtils.isJson(valueIn)) {
-                String valueStr = DataUtils.phoneFormat(valueIn);
-                PhoneWritable contactList = JSON.parseObject(valueStr, PhoneWritable.class);
-                for (ContactWritable contact : contactList.getPhoneMapList()) {
-                    String rowKeyStr      = contact.getPhone();
-                    String nameColumnData = contact.getName();
-                    Put    putContact     = new Put(rowKeyStr.getBytes());
-                    putContact.addColumn("info".getBytes(), "name".getBytes(), nameColumnData.getBytes());
-                    userTablePutList.add(putContact);
+            if (DataUtils.isJsonArray(value.toString())) {
+                String                valueStr            = DataUtils.phoneFormat(value.toString());
+                List<ContactWritable> contactWritableList =  JSON.parseArray(valueStr, ContactWritable.class);
+                for (ContactWritable contact : contactWritableList) {
+                    for (String Phone:StringUtils.split(contact.getPhone(), PunctuationConst.COMMA,-1)) {
+                        String nameColumnData = contact.getName();
+                        Put putContact = new Put(Bytes.toBytes(Phone));
+                        putContact.addColumn(Bytes.toBytes("info"), Bytes.toBytes("name"), Bytes.toBytes(nameColumnData));
+                        userTablePutList.add(putContact);
+                    }
                 }
             } else {
-                userId = valueIn;
+                userId = value.toString();
             }
         }
 
         for (Put putContact : userTablePutList) {
             Put wideTablePut = new Put(putContact);
-            wideTablePut.addColumn("user".getBytes(), userId.getBytes(), "1".getBytes());
+            wideTablePut.addColumn(Bytes.toBytes("user"), Bytes.toBytes(userId), Bytes.toBytes("1"));
             wideTablePutList.add(wideTablePut);
         }
 
-        HbaseUtils.saveData2Hbase("userInfo:" + userId, userTablePutList);
-        HbaseUtils.saveData2Hbase("3rdapi:phoneWideTable", wideTablePutList);
+
+        HbaseUtils.saveData2Hbase("userInfo:" + userId, userTablePutList,connection);
+        HbaseUtils.saveData2Hbase("3rdapi:phoneWideTable", wideTablePutList,connection);
 
     }
+
 
 }

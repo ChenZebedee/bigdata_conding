@@ -1,6 +1,7 @@
 package com.mnw.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.io.Files;
 import com.mnw.data.config.HBaseData;
 import com.mnw.data.constant.DataConstant;
 import com.mnw.data.constant.PunctuationConst;
@@ -10,7 +11,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.protobuf.generated.HBaseProtos;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
@@ -81,21 +81,23 @@ public class HbaseUtils {
      * @param putList   the put list
      * @return the boolean
      */
-    public static boolean saveData2Hbase(String tableName, List<Put> putList) {
+    public static boolean saveData2Hbase(String tableName, List<Put> putList, Connection connection) {
         boolean isSuccess = false;
-        try (Connection connection = getConnection();
-             Admin admin = connection.getAdmin();
-                ) {
-            if (!admin.tableExists(TableName.valueOf(tableName))){
+        try (
+                Admin admin = connection.getAdmin()
+        ) {
+            TableName hTableName = TableName.valueOf(tableName);
+            if (!admin.tableExists(hTableName)) {
                 HTableDescriptor hTableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));
                 hTableDescriptor.addFamily(new HColumnDescriptor("info"));
-               admin.createTable(hTableDescriptor);
+                admin.createTable(hTableDescriptor);
             }
-            HTable hTable = (HTable) connection.getTable(TableName.valueOf(tableName));
+            HTable hTable = (HTable) connection.getTable(hTableName);
             hTable.setAutoFlushTo(false);
-            hTable.setWriteBufferSize(100 * 1024 * 1024);
+            hTable.setWriteBufferSize(10 * 1024 * 1024);
             hTable.put(putList);
             hTable.flushCommits();
+            hTable.close();
             isSuccess = true;
         } catch (Exception e) {
             isSuccess = false;
@@ -217,7 +219,8 @@ public class HbaseUtils {
             List<Put>                        putList    = new ArrayList<>();
             for (String rowKey : rowKeyList) {
                 Put put = new Put(Bytes.toBytes(rowKey));
-                put.addColumn(Bytes.toBytes(insertFamilyName), Bytes.toBytes(insertColumnName), Bytes.toBytes(dataMap.get(rowKey).size()));
+                System.out.println(dataMap.get(rowKey).size());
+                put.addColumn(Bytes.toBytes(insertFamilyName), Bytes.toBytes(insertColumnName), Bytes.toBytes(String.valueOf(dataMap.get(rowKey).size())));
                 putList.add(put);
             }
             table.put(putList);
@@ -288,13 +291,12 @@ public class HbaseUtils {
      * @param rowKeyList the row key list
      * @return the int
      */
-    public static int queryTableRowKeyExists(String tableName, List<String> rowKeyList) {
+    public static int queryTableRowKeyExists(String tableName, List<String> rowKeyList, Connection connection) {
         int existsNum = 0;
         try {
-            Connection connection       = getConnection();
-            Table      table            = connection.getTable(TableName.valueOf(tableName));
-            List<Get>  getList          = rowKeyList2GetList(rowKeyList);
-            boolean[]  getBooleanValues = table.existsAll(getList);
+            Table     table            = connection.getTable(TableName.valueOf(tableName));
+            List<Get> getList          = rowKeyList2GetList(rowKeyList);
+            boolean[] getBooleanValues = table.existsAll(getList);
 
             for (boolean isExists : getBooleanValues) {
                 if (isExists) {
@@ -307,15 +309,14 @@ public class HbaseUtils {
         return existsNum;
     }
 
-    public static List<String> queryTableRowKey(String tableName) {
+    public static List<String> queryTableRowKey(String tableName, Connection connection) {
         List<String> rowKeyList = new ArrayList<>();
         try {
-            Connection connection = getConnection();
-            Table      table      = connection.getTable(TableName.valueOf(tableName));
-            Scan scan = new Scan();
+            Table table = connection.getTable(TableName.valueOf(tableName));
+            Scan  scan  = new Scan();
             scan.setBatch(1000);
             ResultScanner scanner = table.getScanner(scan);
-            for (Result data:scanner){
+            for (Result data : scanner) {
                 rowKeyList.add(Bytes.toString(data.getRow()));
             }
         } catch (IOException e) {
@@ -324,14 +325,37 @@ public class HbaseUtils {
         return rowKeyList;
     }
 
-    public static List<String> listTableName(String nameSpace){
+    public static List<String> queryTableColumnData(String tableName,String familyName,String columnName,Connection connection,List<String> outColumns){
+        List<String> outData = new ArrayList<>();
+        try {
+            Table table = connection.getTable(TableName.valueOf(tableName));
+            Scan scan = new Scan();
+            scan.setBatch(2000);
+            ResultScanner scanner = table.getScanner(scan);
+            for (Result data:scanner){
+                Map<byte[],byte[]> outValueMap = data.getFamilyMap(Bytes.toBytes(familyName));
+                List<String> columnDataList = new ArrayList<>();
+                for (String outColumn:outColumns){
+                    columnDataList.add(Bytes.toString(outValueMap.get(Bytes.toBytes(outColumn))));
+                }
+                String sum = Bytes.toString(data.getValue(Bytes.toBytes("info"),Bytes.toBytes("sum")));
+                if (DataUtils.isNumeric(sum)&&Integer.parseInt(sum)>1) {
+                    addData2File("/home/hadoop/data/phone/out/sum.csv", Bytes.toString(data.getRow()) + "," + StringUtils.join(columnDataList, PunctuationConst.COMMA) + ","+sum);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return outData;
+    }
+
+    public static List<String> listTableName(String nameSpace, Connection connection) {
         List<String> tableNameList = new ArrayList<>();
         try {
-            Connection       connection = getConnection();
-            Admin            admin = connection.getAdmin();
-            HTableDescriptor[] hTableDescriptors = admin.listTableDescriptorsByNamespace(nameSpace);
-            for (HTableDescriptor hTableDescriptor:hTableDescriptors){
-                tableNameList.add(hTableDescriptor.getNameAsString());
+            Admin       admin      = connection.getAdmin();
+            TableName[] tableNames = admin.listTableNamesByNamespace(nameSpace);
+            for (TableName tableName : tableNames) {
+                tableNameList.add(tableName.getNameAsString());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -589,6 +613,29 @@ public class HbaseUtils {
         return cacheData;
 
     }
+
+
+    public static void checkSum(String keyFilePath, String outPath, List<String> checkStringList) {
+        Connection connection = null;
+        try {
+            connection = getConnection();
+            for (String tableName : Files.readLines(new File(keyFilePath), StandardCharsets.UTF_8)) {
+                List<String>        rowkeyList = queryTableRowKey(tableName, connection);
+                Map<String, String> valueMap   = new HashMap<>();
+                if (rowkeyList.size() == 0) {
+                    continue;
+                }
+                for (String ableName2 : checkStringList) {
+                    int check = queryTableRowKeyExists(ableName2, rowkeyList, connection);
+                    valueMap.put(ableName2, String.valueOf(check));
+                }
+                addData2File(outPath,tableName+","+StringUtils.join(valueMap.values()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

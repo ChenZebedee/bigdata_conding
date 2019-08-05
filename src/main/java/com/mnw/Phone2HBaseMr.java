@@ -5,11 +5,13 @@ import com.mnw.reduce.Phone2HBaseReduce;
 import com.mnw.utils.HbaseUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.MapWritable;
+import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
@@ -56,8 +58,9 @@ public class Phone2HBaseMr extends Configured implements Tool {
         // 1.Get Configuration
         Configuration conf = new Configuration();
         conf.set("mapred.job.queue.name", "hadoop");
+        conf.set(TableOutputFormat.OUTPUT_TABLE,"3rdapi:phoneWideTable");
 
-        conf.set("inPath1", args[1]);
+        conf.set("inPath1", args[0]);
         conf.set("outPath1", "/bqsOut1/");
         //conf.set("mapreduce.reduce.memory.mb","8190");
 
@@ -65,17 +68,24 @@ public class Phone2HBaseMr extends Configured implements Tool {
         HbaseUtils.systemConf(conf);
         Job job1 = Job.getInstance(conf, "Phone2HBase");
         job1.setJarByClass(MlpBqsMr.class);
-//        job1.setNumReduceTasks(8);
+        job1.setNumReduceTasks(8);
         Path inPath1 = new Path(conf.get("inPath1"));
         FileInputFormat.addInputPath(job1, inPath1);
+        Path outPath = new Path("/outNull");
+        FileOutputFormat.setOutputPath(job1, outPath);
 
         job1.setMapperClass(Phone2HBaseMapper.class);
         job1.setMapOutputKeyClass(Text.class);
-        job1.setMapOutputValueClass(MapWritable.class);
+        job1.setMapOutputValueClass(Text.class);
 
         job1.setReducerClass(Phone2HBaseReduce.class);
-        job1.setOutputKeyClass(Text.class);
-        job1.setOutputValueClass(Text.class);
+//        job1.setOutputKeyClass(NullWritable.class);
+//        job1.setOutputValueClass(Text.class);
+        job1.setOutputFormatClass(TableOutputFormat.class);
+        FileSystem dfs = FileSystem.get(conf);
+        if (dfs.exists(outPath)) {
+            dfs.delete(outPath, true);
+        }
 
         Date endTime = new Date();
         LOGGER.info(String.valueOf(endTime.getTime()));

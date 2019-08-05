@@ -1,6 +1,8 @@
 package com.mnw.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import scala.collection.immutable.Map;
 
@@ -58,10 +60,19 @@ public class DataUtils {
     public static boolean isJson(String inStr) {
         boolean result = false;
         try {
-            Object object = JSON.parseObject(inStr);
+            JSONObject object = JSON.parseObject(inStr);
             result = true;
-        } catch (Exception e) {
-            result = false;
+        } catch (Exception ignored) {
+        }
+        return result;
+    }
+    public static boolean isJsonArray(String inStr){
+        boolean result = false;
+        try {
+            JSONArray jsonArray = JSONArray.parseArray(inStr);
+            result=true;
+        }catch (Exception e){
+            result=false;
         }
         return result;
     }
@@ -72,5 +83,17 @@ public class DataUtils {
                 replace("+86", "").
                 replace("-", "").
                 replaceAll("^86","");
+    }
+
+    public final static boolean isNumeric(String s) {
+        if (s != null && !"".equals(s.trim()))
+            return s.matches("^[0-9]*$");
+        else
+            return false;
+    }
+
+    public static void main(String[] args) {
+        String s = "8612312312";
+        System.out.println(phoneFormat(s));
     }
 }
