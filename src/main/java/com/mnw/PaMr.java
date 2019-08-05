@@ -242,7 +242,7 @@ public class PaMr extends Configured implements Tool {
             job6.setReducerClass(MlpPaReduce3.class);
             job6.setOutputFormatClass(TableOutputFormat.class);
 
-        }else{
+        } else {
             FileInputFormat.addInputPath(job6, new Path(conf.get("inPath10")));
             job6.setMapperClass(PaMapper3.class);
             job6.setMapOutputKeyClass(Text.class);
@@ -254,9 +254,7 @@ public class PaMr extends Configured implements Tool {
         }
 
 
-
-
-            return (((job1.waitForCompletion(true) && job2.waitForCompletion(true)) & (job3.waitForCompletion(true) && job4.waitForCompletion(true)) & (job5.waitForCompletion(true))) && job6.waitForCompletion(true)) ? 0 : 1;
+        return (((job1.waitForCompletion(true) && job2.waitForCompletion(true)) & (job3.waitForCompletion(true) && job4.waitForCompletion(true)) & (job5.waitForCompletion(true))) && job6.waitForCompletion(true)) ? 0 : 1;
 
     }
 

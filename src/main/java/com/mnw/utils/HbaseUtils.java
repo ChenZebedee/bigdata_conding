@@ -325,22 +325,22 @@ public class HbaseUtils {
         return rowKeyList;
     }
 
-    public static List<String> queryTableColumnData(String tableName,String familyName,String columnName,Connection connection,List<String> outColumns){
+    public static List<String> queryTableColumnData(String tableName, String familyName, String columnName, Connection connection, List<String> outColumns) {
         List<String> outData = new ArrayList<>();
         try {
             Table table = connection.getTable(TableName.valueOf(tableName));
-            Scan scan = new Scan();
+            Scan  scan  = new Scan();
             scan.setBatch(2000);
             ResultScanner scanner = table.getScanner(scan);
-            for (Result data:scanner){
-                Map<byte[],byte[]> outValueMap = data.getFamilyMap(Bytes.toBytes(familyName));
-                List<String> columnDataList = new ArrayList<>();
-                for (String outColumn:outColumns){
+            for (Result data : scanner) {
+                Map<byte[], byte[]> outValueMap    = data.getFamilyMap(Bytes.toBytes(familyName));
+                List<String>        columnDataList = new ArrayList<>();
+                for (String outColumn : outColumns) {
                     columnDataList.add(Bytes.toString(outValueMap.get(Bytes.toBytes(outColumn))));
                 }
-                String sum = Bytes.toString(data.getValue(Bytes.toBytes("info"),Bytes.toBytes("sum")));
-                if (DataUtils.isNumeric(sum)&&Integer.parseInt(sum)>1) {
-                    addData2File("/home/hadoop/data/phone/out/sum.csv", Bytes.toString(data.getRow()) + "," + StringUtils.join(columnDataList, PunctuationConst.COMMA) + ","+sum);
+                String sum = Bytes.toString(data.getValue(Bytes.toBytes("info"), Bytes.toBytes("sum")));
+                if (DataUtils.isNumeric(sum) && Integer.parseInt(sum) > 1) {
+                    addData2File("/home/hadoop/data/phone/out/sum.csv", Bytes.toString(data.getRow()) + "," + StringUtils.join(columnDataList, PunctuationConst.COMMA) + "," + sum);
                 }
             }
         } catch (IOException e) {
@@ -629,13 +629,12 @@ public class HbaseUtils {
                     int check = queryTableRowKeyExists(ableName2, rowkeyList, connection);
                     valueMap.put(ableName2, String.valueOf(check));
                 }
-                addData2File(outPath,tableName+","+StringUtils.join(valueMap.values()));
+                addData2File(outPath, tableName + "," + StringUtils.join(valueMap.values()));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 
 
 }

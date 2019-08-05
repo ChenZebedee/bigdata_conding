@@ -10,13 +10,12 @@ import org.apache.hadoop.io.Text;
 import java.io.IOException;
 
 /**
- *
  * @author shaodi.chen
  * @date 2019/7/31
  */
-public class CollisionMapper extends TableMapper<Text,Text> {
+public class CollisionMapper extends TableMapper<Text, Text> {
 
-    Text outKey = new Text();
+    Text outKey   = new Text();
     Text outValue = new Text();
 
     @Override

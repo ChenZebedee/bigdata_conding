@@ -40,12 +40,12 @@ public class ColumnHeadConstant {
      * The constant T_3RDAPI_PA_OVERDUE_QUERY_DATA.
      */
     public static final String T_3RDAPI_PA_OVERDUE_QUERY_DATA     = "overdue_query_data__";
-    public static final String T_3RDAPI_PA_LOAN_QUERY_DATA="loan_query_data__";
-    public static final String T_3RDAPI_PA_LOAN_RECORD="loan_record__";
-    public static final String T_3RDAPI_PA_LOAN_CLASSIFICATION="loan_classification__";
-    public static final String T_3RDAPI_PA_BLACKLIST_QUERY_DATA="blacklist_query_data__";
-    public static final String T_3RDAPI_PA_BLACKLIST_OTHERS="blacklist_others__";
-    public static final String T_3RDAPI_PA_YELLOW_PAGE="yellow_page__";
-    public static final String T_3RDAPI_PA_PHONE_TAG="phone_tag__";
+    public static final String T_3RDAPI_PA_LOAN_QUERY_DATA        = "loan_query_data__";
+    public static final String T_3RDAPI_PA_LOAN_RECORD            = "loan_record__";
+    public static final String T_3RDAPI_PA_LOAN_CLASSIFICATION    = "loan_classification__";
+    public static final String T_3RDAPI_PA_BLACKLIST_QUERY_DATA   = "blacklist_query_data__";
+    public static final String T_3RDAPI_PA_BLACKLIST_OTHERS       = "blacklist_others__";
+    public static final String T_3RDAPI_PA_YELLOW_PAGE            = "yellow_page__";
+    public static final String T_3RDAPI_PA_PHONE_TAG              = "phone_tag__";
 
 }

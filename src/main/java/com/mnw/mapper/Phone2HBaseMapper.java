@@ -25,11 +25,11 @@ public class Phone2HBaseMapper extends Mapper<LongWritable, Text, Text, Text> {
             line = StringUtils.split(value.toString(), PunctuationConst.COMMA, -1);
         }
         if (PunctuationConst.FOUR_INT == line.length) {
-            context.getCounter("readData","FOUR").increment(1);
+            context.getCounter("readData", "FOUR").increment(1);
             outKey.set(line[3]);
             outValue.set(line[0]);
         } else if (PunctuationConst.THREE_INT == line.length) {
-            context.getCounter("readData","THREE").increment(1);
+            context.getCounter("readData", "THREE").increment(1);
             outKey.set(line[0]);
             outValue.set(line[2]);
         } else {

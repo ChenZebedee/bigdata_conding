@@ -34,7 +34,7 @@ public class PaMapper22 extends Mapper<LongWritable, Text, Text, MapWritable> {
                 break;
             case TableNameConst.T_3RDAPI_PA_LOAN_QUERY_DATA:
                 outKey.set(columnData[1]);
-                outValue.put(new Text( "f_query_data_id"), new Text(columnData[2]));
+                outValue.put(new Text("f_query_data_id"), new Text(columnData[2]));
                 break;
             default:
                 outKey.set("N");

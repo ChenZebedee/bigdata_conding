@@ -58,7 +58,7 @@ public class Phone2HBaseMr extends Configured implements Tool {
         // 1.Get Configuration
         Configuration conf = new Configuration();
         conf.set("mapred.job.queue.name", "hadoop");
-        conf.set(TableOutputFormat.OUTPUT_TABLE,"3rdapi:phoneWideTable");
+        conf.set(TableOutputFormat.OUTPUT_TABLE, "3rdapi:phoneWideTable");
 
         conf.set("inPath1", args[0]);
         conf.set("outPath1", "/bqsOut1/");

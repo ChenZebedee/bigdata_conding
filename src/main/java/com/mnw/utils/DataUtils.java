@@ -66,23 +66,24 @@ public class DataUtils {
         }
         return result;
     }
-    public static boolean isJsonArray(String inStr){
+
+    public static boolean isJsonArray(String inStr) {
         boolean result = false;
         try {
             JSONArray jsonArray = JSONArray.parseArray(inStr);
-            result=true;
-        }catch (Exception e){
-            result=false;
+            result = true;
+        } catch (Exception e) {
+            result = false;
         }
         return result;
     }
 
-    public static String phoneFormat(String phone){
+    public static String phoneFormat(String phone) {
         return phone.replace("\u00a0", "").
                 replace(" ", "").
                 replace("+86", "").
                 replace("-", "").
-                replaceAll("^86","");
+                replaceAll("^86", "");
     }
 
     public final static boolean isNumeric(String s) {

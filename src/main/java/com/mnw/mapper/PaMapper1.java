@@ -16,8 +16,8 @@ import java.io.IOException;
  */
 public class PaMapper1 extends Mapper<LongWritable, Text, Text, MapWritable> {
 
-    private Text                              outKey           = new Text();
-    private MapWritable                       outValue         = new MapWritable();
+    private Text        outKey   = new Text();
+    private MapWritable outValue = new MapWritable();
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -26,10 +26,10 @@ public class PaMapper1 extends Mapper<LongWritable, Text, Text, MapWritable> {
         switch (columnData[0]) {
             case TableNameConst.T_3RDAPI_PA_OVERDUE_CLASSIFICATION:
                 outKey.set(columnData[2]);
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_OVERDUE_CLASSIFICATION +  columnData[8] + "__" + columnData[9] + "__f_record_nums"), new Text(columnData[3]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_OVERDUE_CLASSIFICATION +  columnData[8] + "__" + columnData[9] + "__f_org_nums"), new Text(columnData[4]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_OVERDUE_CLASSIFICATION +  columnData[8] + "__" + columnData[9] + "__f_max_amount"), new Text(columnData[5]));
-                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_OVERDUE_CLASSIFICATION +  columnData[8] + "__" + columnData[9] + "__f_longest_days"), new Text(columnData[6]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_OVERDUE_CLASSIFICATION + columnData[8] + "__" + columnData[9] + "__f_record_nums"), new Text(columnData[3]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_OVERDUE_CLASSIFICATION + columnData[8] + "__" + columnData[9] + "__f_org_nums"), new Text(columnData[4]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_OVERDUE_CLASSIFICATION + columnData[8] + "__" + columnData[9] + "__f_max_amount"), new Text(columnData[5]));
+                outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_OVERDUE_CLASSIFICATION + columnData[8] + "__" + columnData[9] + "__f_longest_days"), new Text(columnData[6]));
                 break;
             case TableNameConst.T_3RDAPI_PA_OVERDUE_RECORD:
                 outKey.set(columnData[1]);

@@ -25,10 +25,9 @@ import java.util.Map;
  */
 public class MlpPaMapper3 extends Mapper<LongWritable, Text, Text, MapWritable> {
 
-    private Text                              outKey           = new Text();
-    private MapWritable                       outValue         = new MapWritable();
     Map<String, String> keyMap = new HashMap<>();
-
+    private Text        outKey   = new Text();
+    private MapWritable outValue = new MapWritable();
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
@@ -58,11 +57,11 @@ public class MlpPaMapper3 extends Mapper<LongWritable, Text, Text, MapWritable> 
             case TableNameConst.PA_SECOND:
             case TableNameConst.PA_FIRST:
                 outValue = HbaseUtils.JsonString2MapWritable(columnData[1]);
-                String getKey = HbaseUtils.mapWritableRemoveData(outValue,"f_query_data_id");
-                outKey.set(keyMap.containsKey(getKey)?keyMap.get(getKey):"NULL");
+                String getKey = HbaseUtils.mapWritableRemoveData(outValue, "f_query_data_id");
+                outKey.set(keyMap.containsKey(getKey) ? keyMap.get(getKey) : "NULL");
                 break;
             case TableNameConst.T_3RDAPI_PA_PHONE_TAG:
-                outKey.set(keyMap.containsKey(columnData[2])?keyMap.get(columnData[2]):"NULL");
+                outKey.set(keyMap.containsKey(columnData[2]) ? keyMap.get(columnData[2]) : "NULL");
                 outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_PHONE_TAG + "f_tag"), new Text(columnData[8]));
                 outValue.put(new Text(ColumnHeadConstant.T_3RDAPI_PA_PHONE_TAG + "f_times"), new Text(columnData[9]));
                 break;

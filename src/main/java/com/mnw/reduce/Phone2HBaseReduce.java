@@ -23,12 +23,13 @@ import java.util.List;
  * @author shaodi.chen
  * @date 2019 /7/30
  */
-public class Phone2HBaseReduce extends TableReducer<Text, Text, NullWritable > {
+public class Phone2HBaseReduce extends TableReducer<Text, Text, NullWritable> {
 
     Connection connection;
+
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
-        connection= HbaseUtils.getConnection();
+        connection = HbaseUtils.getConnection();
     }
 
     @Override
@@ -39,11 +40,11 @@ public class Phone2HBaseReduce extends TableReducer<Text, Text, NullWritable > {
         for (Text value : values) {
             if (DataUtils.isJsonArray(value.toString())) {
                 String                valueStr            = DataUtils.phoneFormat(value.toString());
-                List<ContactWritable> contactWritableList =  JSON.parseArray(valueStr, ContactWritable.class);
+                List<ContactWritable> contactWritableList = JSON.parseArray(valueStr, ContactWritable.class);
                 for (ContactWritable contact : contactWritableList) {
-                    for (String Phone:StringUtils.split(contact.getPhone(), PunctuationConst.COMMA,-1)) {
+                    for (String Phone : StringUtils.split(contact.getPhone(), PunctuationConst.COMMA, -1)) {
                         String nameColumnData = contact.getName();
-                        Put putContact = new Put(Bytes.toBytes(Phone));
+                        Put    putContact     = new Put(Bytes.toBytes(Phone));
                         putContact.addColumn(Bytes.toBytes("info"), Bytes.toBytes("name"), Bytes.toBytes(nameColumnData));
                         userTablePutList.add(putContact);
                     }
@@ -60,8 +61,8 @@ public class Phone2HBaseReduce extends TableReducer<Text, Text, NullWritable > {
         }
 
 
-        HbaseUtils.saveData2Hbase("userInfo:" + userId, userTablePutList,connection);
-        HbaseUtils.saveData2Hbase("3rdapi:phoneWideTable", wideTablePutList,connection);
+        HbaseUtils.saveData2Hbase("userInfo:" + userId, userTablePutList, connection);
+        HbaseUtils.saveData2Hbase("3rdapi:phoneWideTable", wideTablePutList, connection);
 
     }
 

@@ -5,9 +5,6 @@ import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * The type Xy reduce.
  *
