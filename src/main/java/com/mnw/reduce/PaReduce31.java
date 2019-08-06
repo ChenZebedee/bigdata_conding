@@ -2,7 +2,7 @@ package com.mnw.reduce;
 
 import com.mnw.data.constant.PunctuationConst;
 import com.mnw.data.constant.TableNameConst;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -20,7 +20,7 @@ public class PaReduce31 extends Reducer<Text, MapWritable, NullWritable, Text> {
         for (MapWritable value : values) {
             midWritable.putAll(value);
         }
-        context.write(NullWritable.get(), new Text(TableNameConst.PA_FIRST + PunctuationConst.SPLITTER_STR + HbaseUtils.mapWritable2JsonString(midWritable)));
+        context.write(NullWritable.get(), new Text(TableNameConst.PA_FIRST + PunctuationConst.SPLITTER_STR + HBaseUtils.mapWritable2JsonString(midWritable)));
 
 
     }

@@ -3,7 +3,7 @@ package com.mnw.mapper;
 import com.mnw.data.constant.ColumnHeadConstant;
 import com.mnw.data.constant.PunctuationConst;
 import com.mnw.data.constant.TableNameConst;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -56,8 +56,8 @@ public class MlpPaMapper3 extends Mapper<LongWritable, Text, Text, MapWritable> 
         switch (columnData[0]) {
             case TableNameConst.PA_SECOND:
             case TableNameConst.PA_FIRST:
-                outValue = HbaseUtils.JsonString2MapWritable(columnData[1]);
-                String getKey = HbaseUtils.mapWritableRemoveData(outValue, "f_query_data_id");
+                outValue = HBaseUtils.JsonString2MapWritable(columnData[1]);
+                String getKey = HBaseUtils.mapWritableRemoveData(outValue, "f_query_data_id");
                 outKey.set(keyMap.containsKey(getKey) ? keyMap.get(getKey) : "NULL");
                 break;
             case TableNameConst.T_3RDAPI_PA_PHONE_TAG:

@@ -2,7 +2,7 @@ package com.mnw;
 
 import com.mnw.mapper.*;
 import com.mnw.reduce.*;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -60,7 +60,7 @@ public class PaMr extends Configured implements Tool {
         Configuration conf = super.getConf();
 
 
-        conf = HbaseUtils.systemConf(conf);
+        conf = HBaseUtils.systemConf(conf);
 
         conf.set("inPath1", strings[0]);
         conf.set("inPath2", strings[1]);

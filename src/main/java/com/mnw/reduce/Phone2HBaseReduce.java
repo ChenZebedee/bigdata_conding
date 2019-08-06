@@ -3,7 +3,7 @@ package com.mnw.reduce;
 import com.alibaba.fastjson.JSON;
 import com.mnw.data.constant.PunctuationConst;
 import com.mnw.utils.DataUtils;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import com.mnw.writable.ContactWritable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.Connection;
@@ -29,7 +29,7 @@ public class Phone2HBaseReduce extends TableReducer<Text, Text, NullWritable> {
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
-        connection = HbaseUtils.getConnection();
+        connection = HBaseUtils.getConnection();
     }
 
     @Override
@@ -61,8 +61,8 @@ public class Phone2HBaseReduce extends TableReducer<Text, Text, NullWritable> {
         }
 
 
-        HbaseUtils.saveData2Hbase("userInfo:" + userId, userTablePutList, connection);
-        HbaseUtils.saveData2Hbase("3rdapi:phoneWideTable", wideTablePutList, connection);
+        HBaseUtils.saveData2Hbase("userInfo:" + userId, userTablePutList, connection);
+        HBaseUtils.saveData2Hbase("3rdapi:phoneWideTable", wideTablePutList, connection);
 
     }
 

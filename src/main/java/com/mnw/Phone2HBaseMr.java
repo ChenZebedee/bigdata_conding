@@ -2,7 +2,7 @@ package com.mnw;
 
 import com.mnw.mapper.Phone2HBaseMapper;
 import com.mnw.reduce.Phone2HBaseReduce;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -65,10 +65,10 @@ public class Phone2HBaseMr extends Configured implements Tool {
         //conf.set("mapreduce.reduce.memory.mb","8190");
 
         // 2.Create Job
-        HbaseUtils.systemConf(conf);
+        HBaseUtils.systemConf(conf);
         Job job1 = Job.getInstance(conf, "Phone2HBase");
         job1.setJarByClass(MlpBqsMr.class);
-        job1.setNumReduceTasks(8);
+        job1.setNumReduceTasks(50);
         Path inPath1 = new Path(conf.get("inPath1"));
         FileInputFormat.addInputPath(job1, inPath1);
         Path outPath = new Path("/outNull");

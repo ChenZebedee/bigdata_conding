@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * Created by shaodi.chen on 2019/4/17.
  */
-public class HbaseUtils {
+public class HBaseUtils {
 
     private static Connection    connection;
     private static Configuration conf = new Configuration();
@@ -149,7 +149,7 @@ public class HbaseUtils {
      * @return the properties
      */
     public static Properties getPropertiesData(String fileName) {
-        InputStream inStream   = HbaseUtils.class.getClassLoader().getResourceAsStream(fileName);
+        InputStream inStream   = HBaseUtils.class.getClassLoader().getResourceAsStream(fileName);
         Properties  properties = new Properties();
         try {
             properties.load(inStream);
@@ -219,7 +219,6 @@ public class HbaseUtils {
             List<Put>                        putList    = new ArrayList<>();
             for (String rowKey : rowKeyList) {
                 Put put = new Put(Bytes.toBytes(rowKey));
-                System.out.println(dataMap.get(rowKey).size());
                 put.addColumn(Bytes.toBytes(insertFamilyName), Bytes.toBytes(insertColumnName), Bytes.toBytes(String.valueOf(dataMap.get(rowKey).size())));
                 putList.add(put);
             }
@@ -314,7 +313,7 @@ public class HbaseUtils {
         try {
             Table table = connection.getTable(TableName.valueOf(tableName));
             Scan  scan  = new Scan();
-            scan.setBatch(1000);
+            scan.setBatch(2000);
             ResultScanner scanner = table.getScanner(scan);
             for (Result data : scanner) {
                 rowKeyList.add(Bytes.toString(data.getRow()));
@@ -616,12 +615,11 @@ public class HbaseUtils {
 
 
     public static void checkSum(String keyFilePath, String outPath, List<String> checkStringList) {
-        Connection connection = null;
         try {
-            connection = getConnection();
+            Connection connection = getConnection();
             for (String tableName : Files.readLines(new File(keyFilePath), StandardCharsets.UTF_8)) {
                 List<String>        rowkeyList = queryTableRowKey(tableName, connection);
-                Map<String, String> valueMap   = new HashMap<>();
+                Map<String, String> valueMap   = new LinkedHashMap<>();
                 if (rowkeyList.size() == 0) {
                     continue;
                 }
@@ -635,6 +633,5 @@ public class HbaseUtils {
             e.printStackTrace();
         }
     }
-
 
 }

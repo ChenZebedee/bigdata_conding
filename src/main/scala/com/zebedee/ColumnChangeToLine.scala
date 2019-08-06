@@ -78,9 +78,6 @@ object ColumnChangeToLine {
         (outKey, outMap)
     }
 
-    def setHbaseData(rowKey: String, columnName: String, data: util.Map[String, String]): HBaseData = {
-        new HBaseData(rowKey, columnName, data)
-    }
 
     def saveData2Hbase(tableName: String, hbaseData: HBaseData): Unit = {
         val outPut: Put = HbaseUtils.data2Put(hbaseData)
