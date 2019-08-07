@@ -3,6 +3,7 @@ package com.mnw.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mnw.data.constant.DataConstant;
 import org.apache.commons.lang3.StringUtils;
 import scala.collection.immutable.Map;
 
@@ -79,10 +80,12 @@ public class DataUtils {
     }
 
     public static String phoneFormat(String phone) {
-        return phone.replace("\u00a0", "").
+        return phone.replace("\\u00a0", "").
                 replace(" ", "").
                 replace("+86", "").
                 replace("-", "").
+                replace("(","").
+                replace(")","").
                 replaceAll("^86", "");
     }
 
@@ -93,8 +96,24 @@ public class DataUtils {
             return false;
     }
 
+    public final static boolean isPhone(String phone){
+        if (phone.matches(DataConstant.PHONE_REGULAR)||phone.matches(DataConstant.PHONE_2_REGULAR)||phone.matches(DataConstant.PHONE_3_REGULAR)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public final static boolean isNotPhone(String phone){
+        if (phone.matches(DataConstant.PHONE_REGULAR)||phone.matches(DataConstant.PHONE_2_REGULAR)||phone.matches(DataConstant.PHONE_3_REGULAR)){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
     public static void main(String[] args) {
-        String s = "8612312312";
+        String s = "(182\\u00a08354\\u00a07688)";
         System.out.println(phoneFormat(s));
     }
 }

@@ -218,8 +218,13 @@ public class HBaseUtils {
             Table                            table      = connection.getTable(TableName.valueOf(tableName));
             List<Put>                        putList    = new ArrayList<>();
             for (String rowKey : rowKeyList) {
+                Map<String,String> valueMap = dataMap.get(rowKey);
+                if (rowKey.equals("18910139079")){
+                    System.out.println(valueMap.size());
+                    System.out.println(valueMap.toString());
+                }
                 Put put = new Put(Bytes.toBytes(rowKey));
-                put.addColumn(Bytes.toBytes(insertFamilyName), Bytes.toBytes(insertColumnName), Bytes.toBytes(String.valueOf(dataMap.get(rowKey).size())));
+                put.addColumn(Bytes.toBytes(insertFamilyName), Bytes.toBytes(insertColumnName), Bytes.toBytes(String.valueOf(valueMap.size())));
                 putList.add(put);
             }
             table.put(putList);
@@ -313,7 +318,7 @@ public class HBaseUtils {
         try {
             Table table = connection.getTable(TableName.valueOf(tableName));
             Scan  scan  = new Scan();
-            scan.setBatch(2000);
+            scan.setBatch(8000);
             ResultScanner scanner = table.getScanner(scan);
             for (Result data : scanner) {
                 rowKeyList.add(Bytes.toString(data.getRow()));

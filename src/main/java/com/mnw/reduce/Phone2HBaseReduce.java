@@ -42,9 +42,12 @@ public class Phone2HBaseReduce extends TableReducer<Text, Text, NullWritable> {
                 String                valueStr            = DataUtils.phoneFormat(value.toString());
                 List<ContactWritable> contactWritableList = JSON.parseArray(valueStr, ContactWritable.class);
                 for (ContactWritable contact : contactWritableList) {
-                    for (String Phone : StringUtils.split(contact.getPhone(), PunctuationConst.COMMA, -1)) {
+                    for (String phone : StringUtils.split(contact.getPhone(), PunctuationConst.COMMA, -1)) {
+                        if (DataUtils.isNotPhone(phone)){
+                            continue;
+                        }
                         String nameColumnData = contact.getName();
-                        Put    putContact     = new Put(Bytes.toBytes(Phone));
+                        Put    putContact     = new Put(Bytes.toBytes(phone));
                         putContact.addColumn(Bytes.toBytes("info"), Bytes.toBytes("name"), Bytes.toBytes(nameColumnData));
                         userTablePutList.add(putContact);
                     }
@@ -52,6 +55,10 @@ public class Phone2HBaseReduce extends TableReducer<Text, Text, NullWritable> {
             } else {
                 userId = value.toString();
             }
+        }
+
+        if (StringUtils.equals("",userId)||StringUtils.equals(" ",userId)||userTablePutList.size()<1){
+            return;
         }
 
         for (Put putContact : userTablePutList) {
