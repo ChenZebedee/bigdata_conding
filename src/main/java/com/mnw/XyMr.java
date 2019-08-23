@@ -2,7 +2,7 @@ package com.mnw;
 
 import com.mnw.mapper.XyMapper;
 import com.mnw.reduce.XyReduce;
-import com.mnw.utils.HbaseUtils;
+import com.mnw.utils.HBaseUtils;
 import com.mnw.writable.SmWritable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -51,7 +51,7 @@ public class XyMr extends Configured implements Tool {
         // 1.Get Configuration
         Configuration conf = super.getConf();
 
-        conf = HbaseUtils.systemConf(conf);
+        conf = HBaseUtils.systemConf(conf);
 
 
         conf.set("inPath1", strings[0]);

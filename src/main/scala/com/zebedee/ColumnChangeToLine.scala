@@ -5,7 +5,7 @@ import java.util.Properties
 
 import com.mnw.data.config.HBaseData
 import com.mnw.data.constant.PunctuationConst
-import com.mnw.utils.{DataUtils, FileUtils, HbaseUtils}
+import com.mnw.utils.{DataUtils, FileUtils, HBaseUtils}
 import org.apache.commons.lang3.StringUtils
 import org.apache.hadoop.hbase.client.Put
 import org.apache.spark.rdd.RDD
@@ -80,8 +80,8 @@ object ColumnChangeToLine {
 
 
     def saveData2Hbase(tableName: String, hbaseData: HBaseData): Unit = {
-        val outPut: Put = HbaseUtils.data2Put(hbaseData)
-        val isSuccess = HbaseUtils.saveData2Hbase(tableName: String, outPut)
+        val outPut: Put = HBaseUtils.data2Put(hbaseData)
+        val isSuccess = HBaseUtils.saveData2Hbase(tableName: String, outPut)
     }
 
 }
