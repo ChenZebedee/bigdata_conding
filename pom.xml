@@ -38,7 +38,7 @@
     <scala.version>2.12.8</scala.version>
     <scala.binary.version>2.10</scala.binary.version>
     <spark.version>1.6.0-cdh5.15.1</spark.version>
-    <hadoop.version>2.6.0-cdh5.15.1</hadoop.version>
+    <hadoop.version>2.10.1</hadoop.version>
     <hbase.version>1.2.0-cdh5.15.1</hbase.version>
     <hive.version>2.3.4</hive.version>
     <flink.version>1.7.0</flink.version>
